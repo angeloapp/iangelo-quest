@@ -462,16 +462,25 @@ canvas{filter:saturate(1.08) contrast(1.05);}
 
 
 
-/* ===== V3 CLICK + READABILITY FIX ===== */
-.btn{color:#f7e7be!important;text-shadow:0 1px 0 rgba(0,0,0,.75),0 0 14px rgba(240,208,112,.18)!important;}
-.btn.sec{color:#e7dcc0!important;}
-.auth-shell{pointer-events:none!important;}
-.auth-shell .auth-link{pointer-events:auto!important;}
-.auth-shell .auth-chip{pointer-events:none!important;}
-.phase{z-index:2;}
-.phase.on{position:relative;z-index:3;}
-#title .phase, #title .btn, #title .cgrid, #title .wgrid, #title .rbox{pointer-events:auto!important;}
-.logo-sub,.ornam{position:relative;z-index:1;}
+/* ===== V5 SAFE POLISH ===== */
+.btn{color:#f7e7be!important;text-shadow:0 1px 0 rgba(0,0,0,.72),0 0 12px rgba(240,208,112,.16)!important;}
+.btn.sec{color:var(--text)!important;}
+.phase{background:linear-gradient(180deg,rgba(14,12,10,.92),rgba(8,7,6,.94));padding:18px;border:1px solid rgba(201,168,76,.28);border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.38),0 0 18px rgba(201,168,76,.08);}
+.ccard,.wcard{background:linear-gradient(180deg,rgba(26,20,14,.96),rgba(14,10,8,.98));}
+.ccard:hover,.ccard.on,.wcard:hover,.wcard.on{transform:translateY(-2px);}
+.hbars,#hotbar,#chat,.ghud{box-shadow:0 18px 40px rgba(0,0,0,.35);}
+.auth-shell{pointer-events:none;}
+.auth-shell .auth-link{pointer-events:auto;}
+.logo-sub,.ornam{color:#cbb487!important;}
+
+
+
+/* ===== V6 GRID VISIBILITY FIX ===== */
+.cgrid,.wgrid{display:grid!important;width:100%!important;visibility:visible!important;opacity:1!important;min-height:120px;align-items:stretch;}
+.ccard,.wcard{display:flex!important;flex-direction:column;align-items:center;justify-content:center;min-height:108px;visibility:visible!important;opacity:1!important;position:relative;z-index:5;color:var(--text)!important;}
+.ci,.cn,.cd{display:block!important;visibility:visible!important;opacity:1!important;}
+#cls-grid:empty::before{content:'Si no aparecen las clases, recarga el archivo';display:block;color:var(--muted);text-align:center;padding:20px;grid-column:1/-1;}
+#world-grid:empty::before{content:'Selecciona una clase para mostrar los mundos';display:block;color:var(--muted);text-align:center;padding:20px;grid-column:1/-1;}
 
 </style>
 </head>

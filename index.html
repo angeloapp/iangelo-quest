@@ -3777,6 +3777,51 @@
       pantano_maldito: ['#080e04', '#101804', '#060c02'],
     };
 
+    // ================================================
+    //  IMGUR ASSET CACHE  -  Preloaded at game start
+    // ================================================
+    const IMGS = {};
+    const IMG_PAT = {};
+    const ASSET_URLS = {
+      h0: "https://i.imgur.com/aRQGe2O.png",
+      h1: "https://i.imgur.com/6MlxHBs.png",
+      h2: "https://i.imgur.com/GZxAHZx.png",
+      h3: "https://i.imgur.com/1xs0yTp.png",
+      "enemy-goblin":     "https://i.imgur.com/ZrBfTAl.png",
+      "enemy-esqueleto":  "https://i.imgur.com/Ms8SPNL.png",
+      "enemy-lobo":       "https://i.imgur.com/HhgemOw.png",
+      "enemy-gnoll":      "https://i.imgur.com/IcqAtEk.png",
+      "enemy-nigromante": "https://i.imgur.com/Rtm9R20.png",
+      "enemy-drake":      "https://i.imgur.com/ZilkTqx.png",
+      "enemy-metin":      "https://i.imgur.com/bPzRR0M.png",
+      "enemy-dragon":     "https://i.imgur.com/E4h3EZR.png",
+      "enemy-lich":       "https://i.imgur.com/ThPFURk.png",
+      "bg_bosque_oscuro":    "https://i.imgur.com/kgO2wig.png",
+      "bg_desierto_eterno":  "https://i.imgur.com/lTyQpIG.png",
+      "bg_dungeon_abismo":   "https://i.imgur.com/7D5oYpH.png",
+      "bg_montanas_nevadas": "https://i.imgur.com/rdOihAJ.png",
+      "bg_ciudad_fantasma":  "https://i.imgur.com/7E01HkA.png",
+      "bg_templo_sagrado":   "https://i.imgur.com/BI4enIt.png",
+      "bg_volcan_eterno":    "https://i.imgur.com/gXOzXEt.png",
+      "bg_pantano_maldito":  "https://i.imgur.com/EwI8sEx.png",
+    };
+    (function preloadAssets() {
+      for (const [k, url] of Object.entries(ASSET_URLS)) {
+        const im = new Image();
+        im.crossOrigin = "anonymous";
+        im.onload  = () => { IMGS[k] = im; IMG_PAT[k] = null; };
+        im.onerror = () => console.warn("IMG load fail:", k, url);
+        im.src = url;
+      }
+    })();
+    function getBgPattern(ctx, mapKey) {
+      const k = "bg_" + mapKey;
+      if (IMG_PAT[k]) return IMG_PAT[k];
+      if (!IMGS[k]) return null;
+      try { const p = ctx.createPattern(IMGS[k], "repeat"); IMG_PAT[k] = p; return p; }
+      catch(e) { return null; }
+    }
+
     const ENEMIES = [
       { name: 'Goblin',           svgId: 'enemy-goblin',      hp: 65,   atk: [9, 20],   xp: 28,  spd: 1.4, col: '#44bb44', lv: 1,  gold: [4, 10],    drop: .65 },
       { name: 'Esqueleto',        svgId: 'enemy-esqueleto',   hp: 110,  atk: [15, 28],  xp: 45,  spd: .9,  col: '#ccccaa', lv: 2,  gold: [8, 18],    drop: .60 },
@@ -4576,7 +4621,16 @@
     //  CANVAS SPRITE RENDERERS (direct drawing, no img)
     // ================================================
     function drawHeroSprite(ctx, cls, x, y, w, h) {
-      // Top-down RPG style: large readable shapes, bold colors
+      // Try Imgur image first
+      const hKey = "h" + cls;
+      if (IMGS[hKey] && IMGS[hKey].complete) {
+        ctx.save();
+        ctx.shadowBlur = 0; ctx.shadowColor = "transparent";
+        ctx.drawImage(IMGS[hKey], x - w * 0.5, y - h * 0.95, w, h);
+        ctx.restore();
+        return;
+      }
+      // Fallback: Top-down RPG style procedural sprite
       const col = CLASSES[cls].col;
       ctx.save();
       ctx.shadowBlur = 0;
@@ -4998,24 +5052,33 @@
         const tile = tiles[y][x];
         const tx = x * T, ty = y * T, h = th(x, y);
         if (tile === 0) {
-          // Textured floor — deterministic variation
-          if (h < (ft.grip * 100)) {
-            ctxW.fillStyle = h < (ft.grip * 50) ? ft.v1 : ft.v2;
+          // Try Imgur background image first
+          const bgPat = getBgPattern(ctxW, G.mapKey);
+          if (bgPat) {
+            ctxW.fillStyle = bgPat;
+            ctxW.fillRect(tx, ty, T, T);
+            // Subtle shadow overlay for atmosphere
+            ctxW.fillStyle = 'rgba(0,0,0,0.08)';
+            ctxW.fillRect(tx, ty, T, T);
           } else {
-            ctxW.fillStyle = ft.b;
-          }
-          ctxW.fillRect(tx, ty, T, T);
-          // Vein / crack accent for dungeon and volcan
-          if (G.mapKey === 'dungeon_abismo' && h > 88) {
-            ctxW.strokeStyle = 'rgba(24,24,34,.7)'; ctxW.lineWidth = 1;
-            ctxW.beginPath(); ctxW.moveTo(tx + T * .2, ty + T * .8); ctxW.lineTo(tx + T * .6, ty + T * .3); ctxW.stroke();
-          } else if (G.mapKey === 'volcan_eterno' && h > 85) {
-            ctxW.strokeStyle = 'rgba(255,68,0,.18)'; ctxW.lineWidth = 1.5;
-            ctxW.beginPath(); ctxW.moveTo(tx + T * .15, ty + T * .7); ctxW.lineTo(tx + T * .55, ty + T * .25); ctxW.stroke();
-          } else if (G.mapKey === 'templo_sagrado' && h > 90) {
-            // Gold tile vein
-            ctxW.strokeStyle = 'rgba(201,168,76,.12)'; ctxW.lineWidth = .8;
-            ctxW.strokeRect(tx + 2, ty + 2, T - 4, T - 4);
+            // Fallback: Textured floor — deterministic variation
+            if (h < (ft.grip * 100)) {
+              ctxW.fillStyle = h < (ft.grip * 50) ? ft.v1 : ft.v2;
+            } else {
+              ctxW.fillStyle = ft.b;
+            }
+            ctxW.fillRect(tx, ty, T, T);
+            // Accent cracks
+            if (G.mapKey === 'dungeon_abismo' && h > 88) {
+              ctxW.strokeStyle = 'rgba(24,24,34,.7)'; ctxW.lineWidth = 1;
+              ctxW.beginPath(); ctxW.moveTo(tx + T * .2, ty + T * .8); ctxW.lineTo(tx + T * .6, ty + T * .3); ctxW.stroke();
+            } else if (G.mapKey === 'volcan_eterno' && h > 85) {
+              ctxW.strokeStyle = 'rgba(255,68,0,.18)'; ctxW.lineWidth = 1.5;
+              ctxW.beginPath(); ctxW.moveTo(tx + T * .15, ty + T * .7); ctxW.lineTo(tx + T * .55, ty + T * .25); ctxW.stroke();
+            } else if (G.mapKey === 'templo_sagrado' && h > 90) {
+              ctxW.strokeStyle = 'rgba(201,168,76,.12)'; ctxW.lineWidth = .8;
+              ctxW.strokeRect(tx + 2, ty + 2, T - 4, T - 4);
+            }
           }
         } else if (tile === 1) {
           // Wall — dark base with inner bevel and subtle diagonal crack

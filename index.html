@@ -3790,7 +3790,6 @@
     //  IMGUR ASSET CACHE  -  Preloaded at game start
     // ================================================
     const IMGS = {};
-    const IMG_PAT = {};
     const ASSET_URLS = {
       h0: "https://i.imgur.com/aRQGe2O.png",
       h1: "https://i.imgur.com/6MlxHBs.png",
@@ -3817,18 +3816,21 @@
     (function preloadAssets() {
       for (const [k, url] of Object.entries(ASSET_URLS)) {
         const im = new Image();
-        // No crossOrigin needed - drawImage is write-only, no canvas taint
-        im.onload = () => { IMGS[k] = im; IMG_PAT[k] = null; };
-        im.onerror = () => console.warn("IMG load fail:", k, url);
+        im.crossOrigin = 'anonymous'; // Required for Vercel+Imgur CORS
+        im.onload  = () => { IMGS[k] = im; };
+        im.onerror = () => {
+          // Retry without crossOrigin (fallback for local file://)
+          const im2 = new Image();
+          im2.onload = () => { IMGS[k] = im2; };
+          im2.src = url;
+        };
         im.src = url;
       }
     })();
-    function getBgPattern(ctx, mapKey) {
-      const k = "bg_" + mapKey;
-      if (IMG_PAT[k]) return IMG_PAT[k];
-      if (!IMGS[k]) return null;
-      try { const p = ctx.createPattern(IMGS[k], "repeat"); IMG_PAT[k] = p; return p; }
-      catch (e) { return null; }
+    // Return bg image for mapKey — simple drawImage, no pattern needed
+    function getFloorImg(mapKey) {
+      const im = IMGS['bg_' + mapKey];
+      return (im && im.naturalWidth > 0) ? im : null;
     }
 
     const ENEMIES = [
@@ -4630,12 +4632,13 @@
     //  CANVAS SPRITE RENDERERS (direct drawing, no img)
     // ================================================
     function drawHeroSprite(ctx, cls, x, y, w, h) {
-      // Try Imgur image first
-      const hKey = "h" + cls;
-      if (IMGS[hKey] && IMGS[hKey].complete) {
+      // Try Imgur hero image first
+      const hKey = 'h' + cls;
+      const hImg = IMGS[hKey];
+      if (hImg && hImg.naturalWidth > 0) {
         ctx.save();
-        ctx.shadowBlur = 0; ctx.shadowColor = "transparent";
-        ctx.drawImage(IMGS[hKey], x - w * 0.5, y - h * 0.95, w, h);
+        ctx.shadowBlur = 0; ctx.shadowColor = 'transparent';
+        ctx.drawImage(hImg, x - w * 0.5, y - h * 0.95, w, h);
         ctx.restore();
         return;
       }
@@ -4846,6 +4849,16 @@
       ctx.restore();
     }
     function drawEnemySprite(ctx, svgId, col, x, y, w, h) {
+      // Try Imgur enemy image first
+      const eImg = IMGS[svgId];
+      if (eImg && eImg.naturalWidth > 0) {
+        ctx.save();
+        ctx.shadowBlur = 0; ctx.shadowColor = 'transparent';
+        ctx.drawImage(eImg, x - w * 0.5, y - h * 0.95, w, h);
+        ctx.restore();
+        return;
+      }
+      // Fallback: procedural canvas sprite
       ctx.save();
       ctx.shadowBlur = 0; ctx.shadowColor = 'transparent'; // prevent blur bleed
       ctx.translate(x, y);
@@ -5061,14 +5074,10 @@
         const tile = tiles[y][x];
         const tx = x * T, ty = y * T, h = th(x, y);
         if (tile === 0) {
-          // Try Imgur background image first
-          const bgPat = getBgPattern(ctxW, G.mapKey);
-          if (bgPat) {
-            ctxW.fillStyle = bgPat;
-            ctxW.fillRect(tx, ty, T, T);
-            // Very subtle shadow overlay for depth (2%)
-            ctxW.fillStyle = 'rgba(0,0,0,0.02)';
-            ctxW.fillRect(tx, ty, T, T);
+          // Try Imgur background image (draw directly - no pattern needed)
+          const bgImg = getFloorImg(G.mapKey);
+          if (bgImg) {
+            ctxW.drawImage(bgImg, tx, ty, T, T);
           } else {
             // Fallback: Textured floor — deterministic variation
             if (h < (ft.grip * 100)) {

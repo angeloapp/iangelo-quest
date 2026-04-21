@@ -1,0 +1,2317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iAngelo Quest — Leyenda Definitiva</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@700;900&family=IM+Fell+English:ital@0;1&display=swap');
+:root{
+  --gold:#c9a84c;--gold2:#f0d070;--gold3:#7a5c1e;
+  --blood:#cc2222;--blood2:#ff4444;
+  --dark:#050403;--dark2:#0d0a07;--dark3:#1a1410;
+  --stone:#1e1810;--stone2:#2a2218;--stone3:#3a3025;
+  --text:#e8d5a0;--muted:#8a7a55;--dim:#3a2a15;
+  --fire:#ff6622;--ice:#88ddff;--pois:#44ff88;--shad:#aa44ff;
+  --ui-bg:rgba(5,4,3,0.92);--ui-b:2px solid rgba(201,168,76,0.45);
+  --r:6px;--tr:0.18s cubic-bezier(0.4,0,0.2,1);
+  --gg:0 0 18px rgba(201,168,76,.4),0 0 36px rgba(201,168,76,.2);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;overflow:hidden;}
+body{background:var(--dark);color:var(--text);font-family:'IM Fell English',serif;
+  cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Ccircle cx='10' cy='10' r='4' fill='none' stroke='%23c9a84c' stroke-width='1.5'/%3E%3Cline x1='10' y1='1' x2='10' y2='7' stroke='%23c9a84c'/%3E%3Cline x1='10' y1='13' x2='10' y2='19' stroke='%23c9a84c'/%3E%3Cline x1='1' y1='10' x2='7' y2='10' stroke='%23c9a84c'/%3E%3Cline x1='13' y1='10' x2='19' y2='10' stroke='%23c9a84c'/%3E%3C/svg%3E") 10 10,crosshair;}
+canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;}
+#cW{z-index:1;pointer-events:all;}
+#cFx{z-index:2;}
+#cWx{z-index:3;}
+
+/* ── TITLE ── */
+#title{position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;background:radial-gradient(ellipse 90% 90% at 50% 40%,#180e04,#050403);
+  overflow:hidden;}
+.tparts{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+.tp{position:absolute;border-radius:50%;animation:tpR linear infinite;opacity:0;}
+@keyframes tpR{0%{opacity:0;transform:translateY(0)scale(0)}10%{opacity:.9}90%{opacity:.2}100%{opacity:0;transform:translateY(-100vh)scale(.4)}}
+.logo{font-family:'Cinzel Decorative',serif;font-size:clamp(2.8rem,8vw,6rem);font-weight:900;
+  background:linear-gradient(175deg,#fff9e0,var(--gold2) 28%,var(--gold) 55%,var(--gold3));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 4px 22px rgba(201,168,76,.55));animation:ls 3s ease-in-out infinite;letter-spacing:.08em;}
+@keyframes ls{0%,100%{filter:drop-shadow(0 4px 22px rgba(201,168,76,.5))}50%{filter:drop-shadow(0 4px 44px rgba(240,208,112,.95))}}
+.logo-sub{font-family:'Cinzel',serif;font-size:clamp(.65rem,1.4vw,.9rem);color:var(--muted);
+  letter-spacing:.5em;text-transform:uppercase;margin:.5rem 0 2rem;}
+.ornam{color:var(--gold3);font-size:1rem;letter-spacing:1em;opacity:.6;margin:.6rem 0;}
+
+.phase{display:none;flex-direction:column;align-items:center;gap:9px;width:min(560px,95vw);}
+.phase.on{display:flex;}
+
+.btn{font-family:'Cinzel',serif;font-weight:700;font-size:clamp(.78rem,1.4vw,.92rem);
+  color:var(--dark);letter-spacing:.07em;padding:.8em 1.8em;border:none;cursor:pointer;
+  background:linear-gradient(180deg,var(--gold2),var(--gold) 50%,var(--gold3));
+  clip-path:polygon(7px 0%,100% 0%,100% calc(100% - 7px),calc(100% - 7px) 100%,0% 100%,0% 7px);
+  transition:all var(--tr);box-shadow:0 4px 14px rgba(201,168,76,.28);
+  position:relative;overflow:hidden;width:100%;}
+.btn::after{content:'';position:absolute;top:-50%;left:-60%;width:35%;height:200%;
+  background:rgba(255,255,255,.13);transform:skewX(-20deg);transition:left .4s;}
+.btn:hover::after{left:160%;}
+.btn:hover{transform:translateY(-2px);box-shadow:0 7px 24px rgba(201,168,76,.52);}
+.btn:active{transform:scale(.97);}
+.btn.sec{background:linear-gradient(180deg,var(--stone3),var(--stone2));color:var(--text);box-shadow:none;}
+.btn2{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:100%;}
+
+/* ── CLASS CARDS con SVG ── */
+.cgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;width:100%;}
+@media(min-width:500px){.cgrid{grid-template-columns:repeat(4,1fr);}}
+.ccard{background:rgba(18,12,6,.97);border:2px solid rgba(201,168,76,.3);border-radius:8px;
+  padding:14px 8px 10px;text-align:center;cursor:pointer;transition:all .22s;position:relative;overflow:hidden;}
+.ccard::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(201,168,76,.07),transparent 65%);opacity:0;transition:opacity .3s;}
+.ccard:hover::before,.ccard.on::before{opacity:1;}
+.ccard:hover,.ccard.on{border-color:var(--gold);box-shadow:var(--gg);transform:translateY(-3px);}
+.ccard-svg{width:72px;height:72px;margin:0 auto 8px;display:block;filter:drop-shadow(0 0 8px rgba(201,168,76,.35));}
+.ccard.on .ccard-svg{filter:drop-shadow(0 0 14px rgba(240,208,80,.7));}
+.cn{font-family:'Cinzel',serif;font-size:.84rem;color:var(--gold);}
+.cd{font-size:.63rem;color:var(--muted);margin-top:3px;line-height:1.4;}
+
+/* ── WORLD CARDS ── */
+.wgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;width:100%;}
+@media(min-width:500px){.wgrid{grid-template-columns:repeat(4,1fr);}}
+.wcard{background:rgba(18,12,6,.97);border:2px solid rgba(201,168,76,.28);border-radius:8px;
+  padding:12px 7px;text-align:center;cursor:pointer;transition:all .22s;position:relative;overflow:hidden;}
+.wcard:hover,.wcard.on{border-color:var(--gold);box-shadow:var(--gg);transform:translateY(-2px);}
+.wcard-art{width:60px;height:60px;margin:0 auto 6px;display:block;}
+
+/* ── HUD ── */
+#hud{position:fixed;inset:0;z-index:10;pointer-events:none;display:none;}
+#hud.on{display:block;}
+.hbars{position:absolute;top:10px;left:10px;background:var(--ui-bg);border:var(--ui-b);
+  border-radius:var(--r);padding:10px 13px;pointer-events:all;backdrop-filter:blur(8px);min-width:255px;}
+.prow{display:flex;gap:10px;align-items:center;margin-bottom:8px;}
+.port{width:54px;height:54px;border-radius:5px;border:2px solid var(--gold3);background:var(--stone);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  cursor:pointer;transition:transform var(--tr);box-shadow:var(--gg);overflow:hidden;}
+.port:hover{transform:scale(1.08);}
+.port svg{width:48px;height:48px;}
+.nlv{font-family:'Cinzel',serif;font-size:.86rem;color:var(--gold);cursor:pointer;}
+.nlv small{color:var(--muted);font-size:.66rem;display:block;}
+.bwrap{display:flex;flex-direction:column;gap:4px;}
+.brow{display:flex;align-items:center;gap:7px;}
+.blbl{font-size:.6rem;letter-spacing:.05em;color:var(--muted);width:18px;text-transform:uppercase;}
+.btrack{flex:1;height:10px;background:#080604;border:1px solid rgba(201,168,76,.18);border-radius:2px;overflow:hidden;}
+.bfill{height:100%;border-radius:2px;transition:width .38s ease;}
+.bfill.hp{background:linear-gradient(90deg,#5a0000,#cc2222,#ff4444);}
+.bfill.mp{background:linear-gradient(90deg,#000a33,#1133aa,#3366ff);}
+.bfill.xp{background:linear-gradient(90deg,#002211,#116633,#22ff88);}
+.bval{font-size:.59rem;color:var(--muted);min-width:65px;text-align:right;}
+.brow-buf{display:flex;gap:3px;margin-top:5px;flex-wrap:wrap;}
+.bufic{width:22px;height:22px;border-radius:3px;background:var(--stone2);border:1px solid var(--gold3);
+  display:flex;align-items:center;justify-content:center;font-size:.8rem;position:relative;}
+.buft{position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--gold);border-radius:0 0 3px 3px;}
+#combo{position:absolute;top:10px;left:50%;transform:translateX(-50%);text-align:center;
+  pointer-events:none;opacity:0;transition:opacity .35s;}
+#combo.on{opacity:1;}
+.cbn{font-family:'Cinzel Decorative',serif;font-size:clamp(2.2rem,4.5vw,4rem);font-weight:900;
+  background:linear-gradient(180deg,#fff,var(--gold2),var(--fire));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 12px rgba(255,170,50,.8));line-height:1;
+  animation:cpop .28s cubic-bezier(.34,1.56,.64,1);}
+@keyframes cpop{from{transform:scale(.5)}to{transform:scale(1)}}
+.cbl{font-family:'Cinzel',serif;font-size:.78rem;letter-spacing:.3em;color:var(--gold);}
+#mm{position:absolute;top:10px;right:10px;border:var(--ui-b);background:var(--dark);pointer-events:all;}
+.mml{font-family:'Cinzel',serif;font-size:.58rem;letter-spacing:.07em;color:var(--muted);
+  text-align:center;padding:3px 0;border-top:1px solid rgba(201,168,76,.18);}
+#hotbar{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);
+  display:flex;gap:4px;pointer-events:all;
+  background:var(--ui-bg);border:var(--ui-b);border-radius:8px;padding:5px 8px;
+  backdrop-filter:blur(8px);}
+.skb{width:50px;height:50px;background:var(--stone);border:2px solid var(--gold3);
+  border-radius:5px;position:relative;cursor:pointer;overflow:hidden;
+  transition:all var(--tr);display:flex;align-items:center;justify-content:center;flex-direction:column;}
+.skb:hover{border-color:var(--gold);transform:translateY(-3px);box-shadow:var(--gg);}
+.ski{font-size:1.5rem;line-height:1;}
+.skk{position:absolute;bottom:2px;right:3px;font-family:'Cinzel',serif;font-size:.5rem;color:var(--muted);}
+.skc{position:absolute;top:2px;left:3px;font-size:.46rem;color:#4488ff;}
+.cdov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:'Cinzel',serif;font-size:.85rem;font-weight:700;color:#fff;border-radius:3px;background:rgba(0,0,0,0);}
+.skb.cd .cdov{background:rgba(0,0,0,.65);}
+.hact{position:absolute;bottom:78px;right:12px;display:flex;flex-direction:column;gap:4px;pointer-events:all;}
+.ab{font-family:'Cinzel',serif;font-size:.66rem;background:var(--ui-bg);border:var(--ui-b);
+  color:var(--text);padding:5px 10px;border-radius:var(--r);cursor:pointer;
+  backdrop-filter:blur(4px);transition:all var(--tr);white-space:nowrap;}
+.ab:hover{border-color:var(--gold);background:rgba(26,16,6,.97);}
+.ghud{position:absolute;bottom:78px;left:12px;background:var(--ui-bg);border:var(--ui-b);
+  border-radius:var(--r);padding:5px 10px;font-family:'Cinzel',serif;font-size:.8rem;
+  color:var(--gold);pointer-events:none;backdrop-filter:blur(4px);}
+.pethud{position:absolute;bottom:102px;left:12px;background:var(--ui-bg);border:var(--ui-b);
+  border-radius:var(--r);padding:4px 10px;font-size:.72rem;color:var(--pois);
+  pointer-events:none;backdrop-filter:blur(4px);display:none;}
+.pethud.on{display:block;}
+#clog{position:absolute;bottom:76px;left:12px;width:265px;max-height:135px;overflow:hidden;pointer-events:none;}
+.cl{font-size:.71rem;line-height:1.4;padding:2px 7px;background:rgba(0,0,0,.55);
+  border-left:3px solid;margin-bottom:2px;animation:sli .25s ease;}
+@keyframes sli{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:none}}
+.cl.dmg{color:#ff9999;border-color:var(--blood);}
+.cl.heal{color:#66ffaa;border-color:#22aa66;}
+.cl.xp{color:#ffdd66;border-color:var(--gold3);}
+.cl.sys{color:var(--ice);border-color:#4488aa;}
+.cl.boss{color:var(--fire);border-color:var(--fire);font-weight:700;}
+.cl.loot{color:#ffcc00;border-color:#aa8800;}
+
+/* ══════════════════════════════════
+   PORTAL TELEPORT — MUNDO INMERSIVO
+══════════════════════════════════ */
+.portal-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
+  gap:16px;
+  padding:4px;
+}
+.portal-card{
+  position:relative;
+  border-radius:12px;
+  overflow:hidden;
+  cursor:pointer;
+  height:190px;
+  background:#050403;
+  border:2px solid rgba(201,168,76,.25);
+  transition:all .3s cubic-bezier(.34,1.4,.64,1);
+  box-shadow:0 4px 20px rgba(0,0,0,.6);
+}
+.portal-card:hover{
+  transform:translateY(-5px) scale(1.02);
+  border-color:var(--gold);
+  box-shadow:0 12px 40px rgba(0,0,0,.8), 0 0 25px rgba(201,168,76,.3);
+}
+.portal-card.active-map{
+  border-color:var(--gold2);
+  box-shadow:0 0 30px rgba(240,208,80,.4);
+}
+.portal-bg{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.portal-overlay{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(to top, rgba(0,0,0,.92) 0%, rgba(0,0,0,.3) 55%, transparent 100%);
+}
+.portal-shimmer{
+  position:absolute;
+  inset:0;
+  opacity:0;
+  background:radial-gradient(ellipse at 50% 30%, rgba(201,168,76,.18) 0%, transparent 65%);
+  transition:opacity .3s;
+}
+.portal-card:hover .portal-shimmer{opacity:1;}
+.portal-vfx{
+  position:absolute;
+  top:0;left:0;right:0;
+  height:60%;
+  pointer-events:none;
+  overflow:hidden;
+}
+.portal-vfx svg{width:100%;height:100%;}
+.portal-info{
+  position:absolute;
+  bottom:0;left:0;right:0;
+  padding:12px 14px 10px;
+  z-index:2;
+}
+.portal-name{
+  font-family:'Cinzel Decorative',serif;
+  font-size:.88rem;
+  color:#fff;
+  text-shadow:0 0 10px rgba(0,0,0,.9);
+  margin-bottom:3px;
+}
+.portal-danger{
+  font-family:'Cinzel',serif;
+  font-size:.62rem;
+  letter-spacing:.05em;
+  display:flex;
+  align-items:center;
+  gap:5px;
+}
+.portal-badge{
+  display:inline-block;
+  padding:2px 7px;
+  border-radius:3px;
+  font-size:.58rem;
+  font-family:'Cinzel',serif;
+  letter-spacing:.04em;
+}
+.pbadge-safe{background:rgba(34,170,100,.35);color:#44ffaa;border:1px solid rgba(34,170,100,.5);}
+.pbadge-danger{background:rgba(180,30,20,.35);color:#ff8888;border:1px solid rgba(180,30,20,.5);}
+.portal-visited{
+  position:absolute;
+  top:8px;right:8px;
+  font-family:'Cinzel',serif;
+  font-size:.55rem;
+  color:var(--gold);
+  background:rgba(0,0,0,.7);
+  padding:2px 5px;
+  border-radius:3px;
+  border:1px solid rgba(201,168,76,.4);
+}
+.portal-enter-btn{
+  display:block;
+  width:100%;
+  margin-top:6px;
+  padding:4px 0;
+  text-align:center;
+  font-family:'Cinzel',serif;
+  font-size:.66rem;
+  letter-spacing:.08em;
+  color:var(--dark);
+  background:linear-gradient(90deg,var(--gold3),var(--gold),var(--gold3));
+  border:none;border-radius:3px;
+  cursor:pointer;
+  opacity:0;
+  transform:translateY(4px);
+  transition:opacity .2s,transform .2s;
+}
+.portal-card:hover .portal-enter-btn{opacity:1;transform:translateY(0);}
+.portal-particles{
+  position:absolute;inset:0;pointer-events:none;overflow:hidden;
+}
+
+/* MODALS */
+.modal{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;
+  background:rgba(5,4,3,.86);backdrop-filter:blur(6px);}
+.modal.on{display:flex;}
+.mbox{background:var(--dark2);border:2px solid var(--gold3);border-radius:8px;padding:22px;
+  width:min(780px,96vw);max-height:90vh;overflow-y:auto;
+  box-shadow:0 0 60px rgba(0,0,0,.9),0 0 18px rgba(201,168,76,.22);
+  animation:min .22s cubic-bezier(.34,1.56,.64,1);position:relative;}
+@keyframes min{from{opacity:0;transform:scale(.88)}to{opacity:1;transform:scale(1)}}
+.mt{font-family:'Cinzel Decorative',serif;font-size:1.25rem;color:var(--gold);
+  text-align:center;margin-bottom:13px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,.22);}
+.mc{position:absolute;top:11px;right:12px;font-size:1.2rem;cursor:pointer;color:var(--muted);}
+.mc:hover{color:var(--gold);}
+
+/* INV */
+.igrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:7px;margin:9px 0;}
+.isl{width:72px;height:72px;background:var(--stone);border:var(--ui-b);border-radius:4px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;transition:all var(--tr);font-size:.6rem;text-align:center;padding:3px;gap:2px;}
+.isl:hover{border-color:var(--gold);box-shadow:var(--gg);}
+.isl.eq{border-color:var(--gold2);box-shadow:var(--gg);}
+.isl.emp{opacity:.22;cursor:default;}
+.tag{font-size:.6rem;padding:1px 4px;border-radius:2px;font-family:'Cinzel',serif;}
+.tag.common{background:#111;color:#aaa;}
+.tag.rare{background:#1a2260;color:#6688ff;}
+.tag.epic{background:#260d2a;color:#cc44ff;}
+.tag.legend{background:#261800;color:var(--gold2);}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;}
+.si{background:var(--stone);border:var(--ui-b);border-radius:4px;padding:10px;
+  cursor:pointer;transition:all var(--tr);text-align:center;}
+.si:hover{border-color:var(--gold);transform:translateY(-2px);}
+.qi{background:var(--stone);border:var(--ui-b);border-radius:4px;padding:10px;margin-bottom:6px;}
+.qi.done{border-color:#22aa66;background:rgba(0,50,22,.4);}
+.qt{font-family:'Cinzel',serif;font-size:.86rem;color:var(--gold);}
+.qd{font-size:.73rem;color:var(--muted);margin:3px 0;}
+.qpw{height:5px;background:#111;border-radius:3px;overflow:hidden;margin-top:5px;}
+.qpb{height:100%;background:linear-gradient(90deg,#005522,#22ff88);border-radius:3px;transition:width .3s;}
+.stg{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.stb{background:var(--stone);border:var(--ui-b);border-radius:4px;padding:8px;}
+.stl{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;}
+.stv{font-family:'Cinzel',serif;font-size:1.3rem;color:var(--gold);}
+.stbtn{font-family:'Cinzel',serif;font-size:.68rem;color:var(--dark);
+  background:linear-gradient(180deg,var(--gold2),var(--gold));
+  border:none;padding:3px 8px;border-radius:3px;cursor:pointer;}
+.stbtn:hover{filter:brightness(1.2);}
+.achi{display:flex;align-items:center;gap:10px;background:var(--stone);border:var(--ui-b);
+  border-radius:4px;padding:9px;margin-bottom:5px;}
+.achi.done{border-color:var(--gold);}
+.tgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.tnode{background:var(--stone);border:var(--ui-b);border-radius:50%;width:56px;height:56px;
+  display:flex;align-items:center;justify-content:center;font-size:1.4rem;
+  cursor:pointer;transition:all var(--tr);margin:auto;}
+.tnode.unl{border-color:var(--gold);box-shadow:var(--gg);}
+.tnode:hover{transform:scale(1.14);}
+.fslot{width:76px;height:76px;background:var(--stone);border:var(--ui-b);border-radius:4px;
+  display:flex;align-items:center;justify-content:center;font-size:1.7rem;
+  cursor:pointer;border-style:dashed;transition:all var(--tr);}
+.fslot.fill{border-style:solid;border-color:var(--gold);}
+.gmb{display:flex;align-items:center;gap:8px;background:var(--stone);border-radius:4px;padding:7px;margin-bottom:4px;}
+.ginp{width:100%;padding:7px;background:#0e0b07;color:var(--text);
+  border:1px solid var(--gold3);border-radius:3px;font-family:'IM Fell English',serif;font-size:.88rem;outline:none;}
+.ginp:focus{border-color:var(--gold);}
+.rkr{display:flex;align-items:center;gap:9px;background:var(--stone);border:var(--ui-b);
+  border-radius:4px;padding:8px 11px;margin-bottom:4px;}
+.rkp{font-family:'Cinzel',serif;font-size:1rem;color:var(--gold);width:26px;}
+.dgrid{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin:12px 0;}
+.dbox{width:66px;height:66px;background:var(--stone);border:var(--ui-b);border-radius:5px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  cursor:pointer;transition:all var(--tr);font-size:.58rem;}
+.dbox.claimed{opacity:.35;cursor:default;border-color:var(--dim);}
+.dbox.today{border-color:var(--gold2);box-shadow:var(--gg);animation:dp 1.2s ease-in-out infinite;}
+.dbox:not(.claimed):hover{border-color:var(--gold);transform:scale(1.05);}
+@keyframes dp{0%,100%{box-shadow:0 0 8px rgba(201,168,76,.4)}50%{box-shadow:0 0 20px rgba(201,168,76,.9)}}
+#bwarn{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:150;
+  text-align:center;pointer-events:none;display:none;}
+#bwarn.on{display:block;animation:bwin .4s ease;}
+@keyframes bwin{from{opacity:0;transform:translate(-50%,-50%)scale(.5)}to{opacity:1;transform:translate(-50%,-50%)scale(1)}}
+.bwt{font-family:'Cinzel Decorative',serif;font-size:clamp(1.8rem,3.5vw,3rem);font-weight:900;
+  color:var(--blood2);text-shadow:0 0 25px rgba(204,34,34,.7);animation:bwp .55s ease-in-out infinite;}
+@keyframes bwp{0%,100%{text-shadow:0 0 22px rgba(204,34,34,.7)}50%{text-shadow:0 0 50px rgba(255,68,68,.9)}}
+#lvfl{position:fixed;inset:0;z-index:140;pointer-events:none;display:none;
+  background:radial-gradient(ellipse 80% 80% at 50% 50%,rgba(255,215,65,.16),transparent 70%);
+  animation:lvf 1.7s ease-out forwards;}
+@keyframes lvf{0%{opacity:1}100%{opacity:0}}
+#toasts{position:fixed;top:68px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;gap:5px;z-index:210;align-items:center;pointer-events:none;}
+.toast{background:rgba(8,5,2,.97);border:var(--ui-b);border-radius:var(--r);
+  padding:7px 17px;font-family:'Cinzel',serif;font-size:.8rem;color:var(--text);
+  animation:tin .32s cubic-bezier(.34,1.56,.64,1) forwards;backdrop-filter:blur(8px);
+  max-width:390px;text-align:center;}
+@keyframes tin{from{opacity:0;transform:translateY(-16px)scale(.9)}to{opacity:1;transform:none}}
+.fdmg{position:fixed;pointer-events:none;z-index:80;font-family:'Cinzel',serif;font-weight:900;
+  text-shadow:1px 1px 0 #000,-1px -1px 0 #000;animation:fdu 1.1s ease-out forwards;}
+@keyframes fdu{0%{opacity:1;transform:translateY(0)scale(1)}14%{transform:translateY(-12px)scale(1.2)}100%{opacity:0;transform:translateY(-65px)scale(.75)}}
+.fdmg.crit{font-size:1.4rem;color:#fff;animation:fdc 1.25s ease-out forwards;}
+@keyframes fdc{0%{opacity:1;transform:translateY(0)scale(.5)rotate(-5deg)}14%{transform:translateY(-18px)scale(1.55)rotate(4deg)}100%{opacity:0;transform:translateY(-85px)scale(.8)}}
+.lootfx{position:fixed;pointer-events:none;z-index:82;font-size:1.7rem;
+  animation:ldr 2.2s ease-out forwards;}
+@keyframes ldr{0%{opacity:1;transform:translateY(0)scale(.7)}15%{transform:translateY(-15px)scale(1.3)}100%{opacity:0;transform:translateY(-85px)scale(.8)}}
+#chat{position:fixed;bottom:78px;right:12px;width:268px;background:var(--ui-bg);
+  border:var(--ui-b);border-radius:6px;backdrop-filter:blur(8px);z-index:20;
+  display:none;flex-direction:column;overflow:hidden;}
+#chat.on{display:flex;}
+#chat-msgs{height:120px;overflow-y:auto;padding:7px;font-size:.7rem;line-height:1.55;}
+#chat-in{width:100%;background:#0a0706;border:none;border-top:1px solid rgba(201,168,76,.18);
+  color:var(--text);padding:7px 9px;font-size:.76rem;font-family:'IM Fell English',serif;outline:none;}
+#end{position:fixed;inset:0;z-index:290;display:none;flex-direction:column;align-items:center;
+  justify-content:center;background:rgba(5,4,3,.96);backdrop-filter:blur(10px);}
+#end.on{display:flex;}
+.et{font-family:'Cinzel Decorative',serif;font-size:clamp(2rem,5vw,4rem);font-weight:900;margin-bottom:1rem;}
+.et.death{background:linear-gradient(180deg,#ff8888,#cc2222);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.et.win{background:linear-gradient(180deg,#fff5d0,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.estats{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin:1.2rem 0 1.8rem;max-width:460px;width:90%;}
+.esx{background:var(--stone2);border:var(--ui-b);border-radius:5px;padding:11px;text-align:center;}
+.esv{font-family:'Cinzel',serif;font-size:1.7rem;color:var(--gold);}
+.esl{font-size:.63rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;}
+.sep{height:1px;background:rgba(201,168,76,.18);margin:8px 0;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--dark);}
+::-webkit-scrollbar-thumb{background:var(--gold3);border-radius:2px;}
+
+/* Portrait SVG in HUD */
+.port-svg-wrap{width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
+</style>
+</head>
+<body>
+
+<canvas id="cBg"></canvas>
+<canvas id="cW"></canvas>
+<canvas id="cFx"></canvas>
+<canvas id="cWx"></canvas>
+
+<!-- SVG CHARACTER SPRITES (inline definitions) -->
+<svg style="display:none" id="svgDefs">
+  <defs>
+    <!-- GUERRERO -->
+    <symbol id="hero-guerrero" viewBox="0 0 72 80">
+      <g filter="url(#glow-gold)">
+      <!-- body armor -->
+      <rect x="22" y="32" width="28" height="26" rx="3" fill="#8b6914" stroke="#c9a84c" stroke-width="1.5"/>
+      <rect x="25" y="34" width="22" height="6" rx="1" fill="#c9a84c" opacity=".7"/>
+      <!-- pauldrons -->
+      <ellipse cx="21" cy="35" rx="7" ry="5" fill="#7a5c1e" stroke="#c9a84c" stroke-width="1"/>
+      <ellipse cx="51" cy="35" rx="7" ry="5" fill="#7a5c1e" stroke="#c9a84c" stroke-width="1"/>
+      <!-- legs -->
+      <rect x="24" y="56" width="10" height="16" rx="2" fill="#5c3d0a" stroke="#c9a84c" stroke-width="1"/>
+      <rect x="38" y="56" width="10" height="16" rx="2" fill="#5c3d0a" stroke="#c9a84c" stroke-width="1"/>
+      <!-- boots -->
+      <rect x="22" y="68" width="13" height="7" rx="2" fill="#3a2808"/>
+      <rect x="37" y="68" width="13" height="7" rx="2" fill="#3a2808"/>
+      <!-- head -->
+      <ellipse cx="36" cy="22" rx="12" ry="13" fill="#c8956c"/>
+      <!-- helmet -->
+      <path d="M24 22 Q24 8 36 7 Q48 8 48 22 L46 22 Q44 12 36 11 Q28 12 26 22Z" fill="#8b6914" stroke="#c9a84c" stroke-width="1.2"/>
+      <!-- visor -->
+      <rect x="27" y="18" width="18" height="5" rx="2" fill="#c9a84c" opacity=".4"/>
+      <!-- eyes -->
+      <ellipse cx="31" cy="23" rx="2.5" ry="2" fill="#ff8800"/>
+      <ellipse cx="41" cy="23" rx="2.5" ry="2" fill="#ff8800"/>
+      <!-- sword -->
+      <rect x="52" y="14" width="3" height="42" rx="1" fill="#e0e8ff" stroke="#aac0ff" stroke-width=".8"/>
+      <rect x="48" y="28" width="11" height="3" rx="1" fill="#c9a84c"/>
+      <ellipse cx="53" cy="14" rx="2.5" ry="2.5" fill="#c9a84c"/>
+      <!-- shield -->
+      <path d="M14 30 L21 28 L21 50 L14 52Z" fill="#8b6914" stroke="#c9a84c" stroke-width="1.2"/>
+      <ellipse cx="17" cy="41" rx="2" ry="4" fill="#c9a84c" opacity=".5"/>
+      </g>
+    </symbol>
+
+    <!-- MAGO -->
+    <symbol id="hero-mago" viewBox="0 0 72 80">
+      <!-- robe -->
+      <path d="M20 36 L18 72 L35 72 L36 58 L37 72 L54 72 L52 36Z" fill="#1a1060" stroke="#4466ff" stroke-width="1.5"/>
+      <!-- robe detail -->
+      <path d="M28 36 L26 72" stroke="#6688ff" stroke-width=".7" opacity=".5"/>
+      <path d="M44 36 L46 72" stroke="#6688ff" stroke-width=".7" opacity=".5"/>
+      <!-- belt -->
+      <rect x="20" y="50" width="32" height="5" rx="2" fill="#c9a84c" opacity=".6"/>
+      <!-- chest -->
+      <rect x="22" y="32" width="28" height="20" rx="3" fill="#22176a" stroke="#4466ff" stroke-width="1.2"/>
+      <path d="M28 35 L44 35 L44 45 L28 45Z" fill="none" stroke="#88aaff" stroke-width=".8" opacity=".4"/>
+      <!-- orb on chest -->
+      <circle cx="36" cy="40" r="5" fill="#3355cc" stroke="#88aaff" stroke-width="1"/>
+      <circle cx="36" cy="40" r="2.5" fill="#aaccff" opacity=".8"/>
+      <!-- shoulders -->
+      <ellipse cx="21" cy="35" rx="6" ry="5" fill="#1a1060" stroke="#4466ff" stroke-width="1"/>
+      <ellipse cx="51" cy="35" rx="6" ry="5" fill="#1a1060" stroke="#4466ff" stroke-width="1"/>
+      <!-- head -->
+      <ellipse cx="36" cy="22" rx="11" ry="12" fill="#c8956c"/>
+      <!-- hat -->
+      <path d="M25 21 Q28 8 36 5 Q44 8 47 21Z" fill="#1a1060" stroke="#4466ff" stroke-width="1.5"/>
+      <path d="M23 21 L49 21 L47 24 L25 24Z" fill="#221a80" stroke="#4466ff" stroke-width="1"/>
+      <!-- hat star -->
+      <circle cx="36" cy="11" r="2.5" fill="#c9a84c"/>
+      <!-- eyes glow -->
+      <ellipse cx="31" cy="23" rx="2.5" ry="2" fill="#4466ff"/>
+      <ellipse cx="41" cy="23" rx="2.5" ry="2" fill="#4466ff"/>
+      <!-- staff -->
+      <rect x="54" y="12" width="3" height="50" rx="1" fill="#4a3010" stroke="#886600" stroke-width=".8"/>
+      <!-- orb top -->
+      <circle cx="55" cy="11" r="6" fill="#1a0a44" stroke="#8866ff" stroke-width="1.5"/>
+      <circle cx="55" cy="11" r="3" fill="#6644cc"/>
+      <circle cx="53" cy="9" r="1.2" fill="#aaaaff" opacity=".8"/>
+      <!-- sparkles -->
+      <circle cx="60" cy="8" r="1.5" fill="#aaccff" opacity=".7"/>
+      <circle cx="52" cy="5" r="1" fill="#8866ff"/>
+      <circle cx="63" cy="14" r="1" fill="#6644cc"/>
+    </symbol>
+
+    <!-- ARQUERO -->
+    <symbol id="hero-arquero" viewBox="0 0 72 80">
+      <!-- legs -->
+      <rect x="24" y="54" width="9" height="18" rx="2" fill="#2d5a1c"/>
+      <rect x="38" y="54" width="9" height="18" rx="2" fill="#2d5a1c"/>
+      <!-- boots -->
+      <rect x="22" y="67" width="12" height="7" rx="2" fill="#1a3008"/>
+      <rect x="37" y="67" width="12" height="7" rx="2" fill="#1a3008"/>
+      <!-- torso -->
+      <rect x="22" y="30" width="28" height="26" rx="3" fill="#2d5a1c" stroke="#44bb44" stroke-width="1.2"/>
+      <!-- quiver -->
+      <rect x="48" y="26" width="7" height="22" rx="3" fill="#4a2a08" stroke="#886600" stroke-width="1"/>
+      <rect x="49" y="22" width="2" height="8" rx="1" fill="#c9a84c"/>
+      <rect x="52" y="20" width="2" height="10" rx="1" fill="#c9a84c"/>
+      <rect x="50" y="24" width="2" height="9" rx="1" fill="#c9a84c"/>
+      <!-- shoulders -->
+      <ellipse cx="21" cy="33" rx="6" ry="4.5" fill="#234a14" stroke="#44bb44" stroke-width="1"/>
+      <ellipse cx="51" cy="33" rx="6" ry="4.5" fill="#234a14" stroke="#44bb44" stroke-width="1"/>
+      <!-- cloak -->
+      <path d="M22 30 L14 55 L22 52Z" fill="#1a3a0c" opacity=".8"/>
+      <!-- head -->
+      <ellipse cx="36" cy="21" rx="11" ry="12" fill="#c8956c"/>
+      <!-- hood -->
+      <path d="M25 18 Q25 9 36 8 Q47 9 47 18 L45 20 L27 20Z" fill="#2d5a1c" stroke="#44bb44" stroke-width="1"/>
+      <!-- eyes -->
+      <ellipse cx="32" cy="22" rx="2" ry="1.8" fill="#44cc44"/>
+      <ellipse cx="40" cy="22" rx="2" ry="1.8" fill="#44cc44"/>
+      <!-- bow -->
+      <path d="M8 15 Q6 40 8 60" fill="none" stroke="#7a5c1e" stroke-width="2.5"/>
+      <path d="M8 15 L10 37 L8 60" fill="none" stroke="#c9a84c" stroke-width=".8"/>
+      <!-- arrow nocked -->
+      <line x1="8" y1="37" x2="22" y2="33" stroke="#c9a84c" stroke-width="1.3"/>
+      <polygon points="22,33 18,30 18,36" fill="#c9a84c"/>
+    </symbol>
+
+    <!-- CHAMÁN -->
+    <symbol id="hero-chaman" viewBox="0 0 72 80">
+      <!-- robe earthy -->
+      <path d="M20 34 L16 72 L34 72 L36 55 L38 72 L56 72 L52 34Z" fill="#3d2a44" stroke="#aa44ff" stroke-width="1.5"/>
+      <!-- rune patterns -->
+      <path d="M25 42 L31 42 M28 39 L28 45" stroke="#aa44ff" stroke-width=".8" opacity=".5"/>
+      <path d="M41 42 L47 42 M44 39 L44 45" stroke="#aa44ff" stroke-width=".8" opacity=".5"/>
+      <!-- torso -->
+      <rect x="22" y="30" width="28" height="20" rx="3" fill="#4a3355" stroke="#aa44ff" stroke-width="1.2"/>
+      <!-- totem on back -->
+      <rect x="16" y="18" width="5" height="36" rx="2" fill="#3a2808" stroke="#886600" stroke-width="1"/>
+      <circle cx="18" cy="18" r="5" fill="#4a1a55" stroke="#aa44ff" stroke-width="1.2"/>
+      <circle cx="18" cy="18" r="2.5" fill="#cc44ff" opacity=".8"/>
+      <!-- feathers -->
+      <path d="M13 14 Q10 9 14 7 Q16 12 18 13" fill="#cc0044" opacity=".8"/>
+      <path d="M11 18 Q7 13 10 11 Q13 16 15 17" fill="#ff6600" opacity=".7"/>
+      <!-- head -->
+      <ellipse cx="36" cy="21" rx="11" ry="12" fill="#c8a07c"/>
+      <!-- headdress -->
+      <path d="M26 17 Q36 4 46 17" fill="none" stroke="#aa44ff" stroke-width="2"/>
+      <circle cx="36" cy="6" r="3.5" fill="#7722aa" stroke="#cc44ff" stroke-width="1"/>
+      <circle cx="26" cy="15" r="2.5" fill="#4400aa" stroke="#aa44ff" stroke-width="1"/>
+      <circle cx="46" cy="15" r="2.5" fill="#4400aa" stroke="#aa44ff" stroke-width="1"/>
+      <!-- face markings -->
+      <path d="M30 22 L34 20 L36 22" stroke="#aa44ff" stroke-width=".8" fill="none"/>
+      <!-- eyes -->
+      <ellipse cx="32" cy="23" rx="2.5" ry="2" fill="#cc44ff"/>
+      <ellipse cx="40" cy="23" rx="2.5" ry="2" fill="#cc44ff"/>
+      <!-- staff -->
+      <rect x="55" y="16" width="3" height="48" rx="1" fill="#3a2808" stroke="#886600" stroke-width=".8"/>
+      <!-- skull totem top -->
+      <ellipse cx="56" cy="14" rx="5" ry="5.5" fill="#ccccaa" stroke="#886600" stroke-width="1"/>
+      <ellipse cx="54" cy="15" rx="1.5" ry="1.5" fill="#222"/>
+      <ellipse cx="58" cy="15" rx="1.5" ry="1.5" fill="#222"/>
+      <!-- glowing orbs around staff -->
+      <circle cx="60" cy="22" r="2" fill="#aa44ff" opacity=".8"/>
+      <circle cx="52" cy="28" r="1.5" fill="#7722aa" opacity=".7"/>
+    </symbol>
+
+    <!-- GOBLIN SVG -->
+    <symbol id="enemy-goblin" viewBox="0 0 60 60">
+      <!-- body -->
+      <ellipse cx="30" cy="38" rx="13" ry="14" fill="#3a7a22" stroke="#2a5a12" stroke-width="1.5"/>
+      <!-- arms -->
+      <path d="M17 36 Q10 40 12 48" stroke="#3a7a22" stroke-width="5" stroke-linecap="round" fill="none"/>
+      <path d="M43 36 Q50 40 48 48" stroke="#3a7a22" stroke-width="5" stroke-linecap="round" fill="none"/>
+      <!-- weapons in hands -->
+      <path d="M12 44 L7 50" stroke="#8b6914" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- legs -->
+      <path d="M24 50 L22 58" stroke="#2a5a12" stroke-width="5" stroke-linecap="round" fill="none"/>
+      <path d="M36 50 L38 58" stroke="#2a5a12" stroke-width="5" stroke-linecap="round" fill="none"/>
+      <!-- head -->
+      <ellipse cx="30" cy="22" rx="13" ry="13" fill="#44aa22"/>
+      <!-- ears pointed -->
+      <polygon points="16,16 12,6 20,14" fill="#44aa22" stroke="#2a5a12" stroke-width="1"/>
+      <polygon points="44,16 48,6 40,14" fill="#44aa22" stroke="#2a5a12" stroke-width="1"/>
+      <!-- eyes evil -->
+      <ellipse cx="25" cy="22" rx="3.5" ry="4" fill="#ff0"/>
+      <ellipse cx="35" cy="22" rx="3.5" ry="4" fill="#ff0"/>
+      <ellipse cx="25" cy="23" rx="1.5" ry="2.5" fill="#000"/>
+      <ellipse cx="35" cy="23" rx="1.5" ry="2.5" fill="#000"/>
+      <!-- nose -->
+      <ellipse cx="30" cy="28" rx="3" ry="2" fill="#2a7a12"/>
+      <circle cx="28" cy="28" r="1" fill="#1a5a0a"/>
+      <circle cx="32" cy="28" r="1" fill="#1a5a0a"/>
+      <!-- mouth jagged -->
+      <path d="M23 33 L26 31 L28 33 L30 31 L32 33 L35 31 L37 33" stroke="#1a4a08" stroke-width="1.5" fill="none"/>
+    </symbol>
+
+    <!-- ESQUELETO -->
+    <symbol id="enemy-esqueleto" viewBox="0 0 60 68">
+      <!-- ribcage -->
+      <rect x="22" y="30" width="16" height="18" rx="2" fill="#ccccaa" stroke="#aaa" stroke-width="1"/>
+      <path d="M22 34 L38 34" stroke="#aaa" stroke-width=".8"/>
+      <path d="M22 38 L38 38" stroke="#aaa" stroke-width=".8"/>
+      <path d="M22 42 L38 42" stroke="#aaa" stroke-width=".8"/>
+      <!-- spine -->
+      <rect x="28" y="28" width="4" height="32" rx="1" fill="#ccccaa"/>
+      <!-- legs bone -->
+      <rect x="22" y="55" width="6" height="12" rx="2" fill="#ccccaa" stroke="#aaa" stroke-width="1"/>
+      <rect x="32" y="55" width="6" height="12" rx="2" fill="#ccccaa" stroke="#aaa" stroke-width="1"/>
+      <!-- arm bones -->
+      <rect x="10" y="30" width="12" height="4" rx="2" fill="#ccccaa" transform="rotate(15,16,32)"/>
+      <rect x="38" y="30" width="12" height="4" rx="2" fill="#ccccaa" transform="rotate(-15,44,32)"/>
+      <!-- skull -->
+      <ellipse cx="30" cy="20" rx="12" ry="13" fill="#ddddbb" stroke="#aaa" stroke-width="1.5"/>
+      <!-- jaw -->
+      <rect x="24" y="28" width="12" height="6" rx="2" fill="#ddddbb" stroke="#aaa" stroke-width="1"/>
+      <path d="M25 30 L25 33 M28 29 L28 33 M31 29 L31 33 M34 29 L34 33" stroke="#888" stroke-width="1"/>
+      <!-- eye holes dark -->
+      <ellipse cx="25" cy="20" rx="4" ry="4.5" fill="#111"/>
+      <ellipse cx="35" cy="20" rx="4" ry="4.5" fill="#111"/>
+      <!-- glowing eyes -->
+      <ellipse cx="25" cy="20" rx="2" ry="2.5" fill="#4466ff" opacity=".8"/>
+      <ellipse cx="35" cy="20" rx="2" ry="2.5" fill="#4466ff" opacity=".8"/>
+      <!-- sword -->
+      <rect x="42" y="14" width="3" height="35" rx="1" fill="#ccccee" stroke="#888" stroke-width=".7"/>
+      <rect x="38" y="24" width="11" height="2.5" rx="1" fill="#aaa"/>
+    </symbol>
+
+    <!-- LOBO ALFA -->
+    <symbol id="enemy-lobo" viewBox="0 0 72 56">
+      <!-- body -->
+      <ellipse cx="38" cy="36" rx="22" ry="14" fill="#554488" stroke="#8844cc" stroke-width="1.5"/>
+      <!-- tail -->
+      <path d="M58 32 Q70 22 65 14 Q60 20 56 30" fill="#443366" stroke="#8844cc" stroke-width="1.2"/>
+      <!-- legs -->
+      <rect x="20" y="44" width="8" height="11" rx="3" fill="#443366"/>
+      <rect x="32" y="44" width="8" height="11" rx="3" fill="#443366"/>
+      <rect x="44" y="44" width="8" height="11" rx="3" fill="#443366"/>
+      <rect x="56" y="40" width="7" height="9" rx="3" fill="#443366"/>
+      <!-- head -->
+      <ellipse cx="20" cy="28" rx="15" ry="13" fill="#665599"/>
+      <!-- snout -->
+      <ellipse cx="12" cy="31" rx="7" ry="5" fill="#554488"/>
+      <!-- ears -->
+      <polygon points="12,16 8,4 18,14" fill="#554488" stroke="#8844cc" stroke-width="1"/>
+      <polygon points="28,15 30,4 22,13" fill="#554488" stroke="#8844cc" stroke-width="1"/>
+      <!-- inner ear -->
+      <polygon points="12,16 10,8 16,14" fill="#cc44aa" opacity=".5"/>
+      <!-- eyes -->
+      <ellipse cx="17" cy="26" rx="3.5" ry="3" fill="#ff4400"/>
+      <ellipse cx="25" cy="25" rx="3.5" ry="3" fill="#ff4400"/>
+      <ellipse cx="17" cy="26" rx="1.5" ry="2" fill="#000"/>
+      <ellipse cx="25" cy="25" rx="1.5" ry="2" fill="#000"/>
+      <!-- nose -->
+      <ellipse cx="10" cy="31" rx="2.5" ry="2" fill="#221122"/>
+      <!-- fangs -->
+      <path d="M8 34 L10 38 L12 34" fill="#fff" opacity=".9"/>
+      <path d="M14 34 L16 39 L18 34" fill="#fff" opacity=".9"/>
+      <!-- back fur spikes -->
+      <path d="M40 22 L43 16 L46 23 L49 17 L52 24 L55 18" fill="none" stroke="#8844cc" stroke-width="1.5" stroke-linecap="round" opacity=".7"/>
+    </symbol>
+
+    <!-- METIN ROJO (boss) -->
+    <symbol id="enemy-metin" viewBox="0 0 80 90">
+      <!-- base rock -->
+      <ellipse cx="40" cy="72" rx="32" ry="14" fill="#660000" stroke="#ff2200" stroke-width="2"/>
+      <!-- main stone body -->
+      <path d="M12 70 L8 40 L20 16 L40 8 L60 16 L72 40 L68 70Z" fill="#440000" stroke="#cc2200" stroke-width="2"/>
+      <!-- red crystal shards -->
+      <path d="M30 8 L25 0 L35 6Z" fill="#ff4400" stroke="#ff6600" stroke-width="1"/>
+      <path d="M40 5 L38 -4 L45 3Z" fill="#ff2200" stroke="#ff5500" stroke-width="1"/>
+      <path d="M50 8 L52 -2 L57 6Z" fill="#ff3300" stroke="#ff5500" stroke-width="1"/>
+      <path d="M18 30 L10 24 L16 38Z" fill="#cc2200" stroke="#ff4400" stroke-width="1"/>
+      <path d="M62 30 L70 24 L64 38Z" fill="#cc2200" stroke="#ff4400" stroke-width="1"/>
+      <!-- cracks glowing -->
+      <path d="M30 70 L35 45 L28 25" fill="none" stroke="#ff4400" stroke-width="2" opacity=".8"/>
+      <path d="M50 70 L45 45 L52 30" fill="none" stroke="#ff6600" stroke-width="1.5" opacity=".8"/>
+      <path d="M20 55 L40 45 L60 55" fill="none" stroke="#ff4400" stroke-width="1.5" opacity=".7"/>
+      <!-- evil eye core -->
+      <circle cx="40" cy="42" r="18" fill="#330000"/>
+      <circle cx="40" cy="42" r="14" fill="#550000" stroke="#ff2200" stroke-width="1.5"/>
+      <ellipse cx="40" cy="42" rx="8" ry="10" fill="#cc0000"/>
+      <ellipse cx="40" cy="42" rx="4" ry="6" fill="#ff2200"/>
+      <!-- pupil -->
+      <ellipse cx="40" cy="42" rx="2" ry="4" fill="#000"/>
+      <!-- glow rings -->
+      <circle cx="40" cy="42" r="14" fill="none" stroke="#ff4400" stroke-width="1" opacity=".5"/>
+      <circle cx="40" cy="42" r="18" fill="none" stroke="#cc2200" stroke-width="1" opacity=".3"/>
+    </symbol>
+
+    <!-- DRAGÓN ESPECTRAL (boss) -->
+    <symbol id="enemy-dragon" viewBox="0 0 100 80">
+      <!-- wings -->
+      <path d="M8 45 Q0 20 18 10 Q30 25 35 40" fill="#3311aa" stroke="#6644ff" stroke-width="1.5" opacity=".9"/>
+      <path d="M92 45 Q100 20 82 10 Q70 25 65 40" fill="#3311aa" stroke="#6644ff" stroke-width="1.5" opacity=".9"/>
+      <!-- wing membranes -->
+      <path d="M8 45 Q12 30 18 10" fill="none" stroke="#4422cc" stroke-width=".8" opacity=".5"/>
+      <path d="M10 42 Q16 28 20 14" fill="none" stroke="#4422cc" stroke-width=".8" opacity=".5"/>
+      <!-- body -->
+      <ellipse cx="50" cy="52" rx="28" ry="18" fill="#220066" stroke="#6644ff" stroke-width="2"/>
+      <!-- scales -->
+      <path d="M28 48 Q50 40 72 48" fill="none" stroke="#4422cc" stroke-width="1" opacity=".6"/>
+      <path d="M30 54 Q50 46 70 54" fill="none" stroke="#4422cc" stroke-width="1" opacity=".6"/>
+      <!-- tail -->
+      <path d="M76 55 Q90 52 95 42 Q92 38 88 45 Q85 35 82 42 Q78 32 74 40" fill="#220066" stroke="#6644ff" stroke-width="1.5"/>
+      <!-- neck -->
+      <path d="M38 34 Q40 22 50 18 Q60 22 62 34" fill="#220066" stroke="#6644ff" stroke-width="1.5"/>
+      <!-- head -->
+      <ellipse cx="50" cy="16" rx="16" ry="14" fill="#2a0077" stroke="#8866ff" stroke-width="2"/>
+      <!-- horns -->
+      <path d="M38 8 L32 0 L36 10" fill="#4422aa" stroke="#8866ff" stroke-width="1"/>
+      <path d="M62 8 L68 0 L64 10" fill="#4422aa" stroke="#8866ff" stroke-width="1"/>
+      <!-- snout -->
+      <ellipse cx="50" cy="22" rx="8" ry="5" fill="#1a0055"/>
+      <!-- eyes glowing -->
+      <ellipse cx="42" cy="14" rx="5" ry="4.5" fill="#aa44ff"/>
+      <ellipse cx="58" cy="14" rx="5" ry="4.5" fill="#aa44ff"/>
+      <ellipse cx="42" cy="14" rx="2.5" ry="3" fill="#fff" opacity=".9"/>
+      <ellipse cx="58" cy="14" rx="2.5" ry="3" fill="#fff" opacity=".9"/>
+      <!-- nostrils -->
+      <circle cx="46" cy="22" r="1.5" fill="#110033"/>
+      <circle cx="54" cy="22" r="1.5" fill="#110033"/>
+      <!-- breath effect -->
+      <path d="M42 25 Q30 30 20 28" stroke="#aa44ff" stroke-width="1.5" fill="none" opacity=".6"/>
+      <circle cx="18" cy="28" r="2" fill="#cc66ff" opacity=".5"/>
+      <!-- claws -->
+      <path d="M28 65 L22 72 M32 68 L28 76 M38 70 L36 78" stroke="#6644ff" stroke-width="2" stroke-linecap="round"/>
+      <path d="M72 65 L78 72 M68 68 L72 76 M62 70 L64 78" stroke="#6644ff" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+
+    <!-- LICH REY (boss) -->
+    <symbol id="enemy-lich" viewBox="0 0 80 90">
+      <!-- dark robe flowing -->
+      <path d="M15 45 L5 88 L30 85 L40 70 L50 85 L75 88 L65 45Z" fill="#050310" stroke="#ffffff" stroke-width="1.5" opacity=".9"/>
+      <!-- robe details -->
+      <path d="M22 50 L18 85" stroke="#333" stroke-width=".8" opacity=".4"/>
+      <path d="M58 50 L62 85" stroke="#333" stroke-width=".8" opacity=".4"/>
+      <!-- chest sigil -->
+      <circle cx="40" cy="58" r="10" fill="none" stroke="#ffffff" stroke-width="1" opacity=".5"/>
+      <path d="M40 48 L44 56 L52 57 L46 63 L48 71 L40 66 L32 71 L34 63 L28 57 L36 56Z" fill="none" stroke="#ffffff" stroke-width=".8" opacity=".6"/>
+      <!-- body bone hands -->
+      <path d="M15 48 Q6 55 8 65 Q10 58 16 55" fill="#ccc" stroke="#aaa" stroke-width="1"/>
+      <path d="M65 48 Q74 55 72 65 Q70 58 64 55" fill="#ccc" stroke="#aaa" stroke-width="1"/>
+      <!-- fingers -->
+      <path d="M8 63 L5 70 M10 65 L8 72 M12 66 L11 73" stroke="#ccc" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M72 63 L75 70 M70 65 L72 72 M68 66 L69 73" stroke="#ccc" stroke-width="1.5" stroke-linecap="round"/>
+      <!-- skull head -->
+      <ellipse cx="40" cy="24" rx="18" ry="20" fill="#ddddcc" stroke="#eeeecc" stroke-width="1.5"/>
+      <!-- crown -->
+      <path d="M22 16 L22 7 L28 12 L34 5 L40 10 L46 5 L52 12 L58 7 L58 16" fill="#c9a84c" stroke="#f0d070" stroke-width="1.5"/>
+      <!-- crown gems -->
+      <circle cx="28" cy="11" r="2.5" fill="#cc4400"/>
+      <circle cx="40" cy="9" r="3" fill="#4422cc"/>
+      <circle cx="52" cy="11" r="2.5" fill="#44aa22"/>
+      <!-- eye sockets deep -->
+      <ellipse cx="31" cy="25" rx="6.5" ry="7" fill="#111"/>
+      <ellipse cx="49" cy="25" rx="6.5" ry="7" fill="#111"/>
+      <!-- soul eyes -->
+      <ellipse cx="31" cy="25" rx="3.5" ry="4" fill="#ffffff" opacity=".9"/>
+      <ellipse cx="49" cy="25" rx="3.5" ry="4" fill="#ffffff" opacity=".9"/>
+      <!-- cheekbones -->
+      <path d="M24 32 Q28 35 32 33" stroke="#bbb" stroke-width="1.2" fill="none"/>
+      <path d="M56 32 Q52 35 48 33" stroke="#bbb" stroke-width="1.2" fill="none"/>
+      <!-- jaw -->
+      <path d="M24 38 L26 45 L30 47 L40 48 L50 47 L54 45 L56 38" fill="#ccccbb" stroke="#aaa" stroke-width="1"/>
+      <path d="M28 44 L28 48 M32 45 L32 49 M36 46 L36 49 M40 46 L40 49 M44 46 L44 49 M48 45 L48 48 M52 44 L52 48" stroke="#999" stroke-width="1"/>
+      <!-- scepter -->
+      <rect x="56" y="18" width="3.5" height="48" rx="1.5" fill="#1a1a2a" stroke="#555" stroke-width=".8"/>
+      <ellipse cx="57" cy="16" rx="8" ry="8" fill="#0a0a1a" stroke="#ffffff" stroke-width="1.5"/>
+      <ellipse cx="57" cy="16" rx="4" ry="4" fill="#ffffff" opacity=".4"/>
+      <!-- soul orbs floating -->
+      <circle cx="20" cy="30" r="4" fill="#ffffff" opacity=".6"/>
+      <circle cx="18" cy="20" r="2.5" fill="#ccccff" opacity=".5"/>
+      <circle cx="65" cy="35" r="3" fill="#ffffff" opacity=".5"/>
+    </symbol>
+
+    <!-- Glow filter -->
+    <filter id="glow-gold" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-red" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-purple" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+</svg>
+
+<!-- TITLE -->
+<div id="title">
+  <div class="tparts" id="tparts"></div>
+  <div style="text-align:center;margin-bottom:1.2rem;">
+    <svg width="72" height="72" viewBox="0 0 72 72" style="filter:drop-shadow(0 0 18px rgba(201,168,76,.7));animation:ls 3s ease-in-out infinite;margin-bottom:.5rem;">
+      <use href="#hero-guerrero"/>
+    </svg>
+    <div class="logo">iAngelo Quest</div>
+    <div class="logo-sub">Leyenda Definitiva · Edición Absoluta</div>
+  </div>
+  <div class="ornam">✦ ✦ ✦</div>
+
+  <div class="phase on" id="ph0">
+    <button class="btn" onclick="goPhase(1,'nueva')">🛡️ Nueva Partida</button>
+    <button class="btn" onclick="tryLoad()">📂 Continuar Partida</button>
+    <div class="btn2">
+      <button class="btn" onclick="goPhase(1,'survival')">🔥 Supervivencia</button>
+      <button class="btn" onclick="goPhase('rank')">🏅 Ranking Global</button>
+    </div>
+    <button class="btn sec" onclick="toast('✦ iAngelo Quest — Los Metines Rojos corrompen la tierra... ¡solo tú puedes detenerlos! ✦',6000)">✦ Lore del Mundo</button>
+  </div>
+
+  <!-- Selección de clase con SVG portraits -->
+  <div class="phase" id="ph1">
+    <div style="font-family:'Cinzel',serif;color:var(--gold);font-size:1rem;margin-bottom:10px;">✦ Elige tu Vocación ✦</div>
+    <div class="cgrid" id="cls-grid"></div>
+    <div class="btn2" style="margin-top:10px;">
+      <button class="btn sec" onclick="goPhase(0)">← Volver</button>
+      <button class="btn" id="btn-cls" onclick="goPhase(2)" disabled>Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- Selección de mundo -->
+  <div class="phase" id="ph2">
+    <div style="font-family:'Cinzel',serif;color:var(--gold);font-size:1rem;margin-bottom:10px;">✦ Elige tu Mundo de Inicio ✦</div>
+    <div class="wgrid" id="world-grid"></div>
+    <div class="btn2" style="margin-top:10px;">
+      <button class="btn sec" onclick="goPhase(1)">← Volver</button>
+      <button class="btn" id="btn-world" onclick="startGame()" disabled>▶ Comenzar Aventura</button>
+    </div>
+  </div>
+
+  <!-- Ranking -->
+  <div class="phase" id="ph-rank" style="width:min(460px,90vw);">
+    <div style="font-family:'Cinzel Decorative',serif;color:var(--gold);font-size:1.1rem;margin-bottom:12px;">🏅 Ranking Global</div>
+    <div id="rank-title-list"></div>
+    <button class="btn sec" style="margin-top:12px;width:100%;" onclick="goPhase(0)">← Volver</button>
+  </div>
+</div>
+
+<!-- HUD -->
+<div id="hud">
+  <div class="hbars">
+    <div class="prow">
+      <div class="port" id="port" onclick="openM('stats')"></div>
+      <div>
+        <div class="nlv" id="nlv" onclick="openM('stats')">Angelo · Nv1<small id="cls-tag">Guerrero</small></div>
+      </div>
+    </div>
+    <div class="bwrap">
+      <div class="brow"><span class="blbl">HP</span><div class="btrack"><div class="bfill hp" id="b-hp"></div></div><span class="bval" id="v-hp">200/200</span></div>
+      <div class="brow"><span class="blbl">MP</span><div class="btrack"><div class="bfill mp" id="b-mp"></div></div><span class="bval" id="v-mp">140/140</span></div>
+      <div class="brow"><span class="blbl">XP</span><div class="btrack"><div class="bfill xp" id="b-xp"></div></div><span class="bval" id="v-xp">0/150</span></div>
+    </div>
+    <div class="brow-buf" id="bufs"></div>
+  </div>
+
+  <div id="combo"><div class="cbn" id="cbn">0x</div><div class="cbl">COMBO</div></div>
+
+  <div id="mm">
+    <canvas id="mmc" width="128" height="128"></canvas>
+    <div class="mml" id="mml">Bosque Oscuro</div>
+  </div>
+
+  <div class="pethud" id="pethud"></div>
+
+  <div class="hact">
+    <button class="ab" onclick="openM('inventory')">🎒 Inventario [I]</button>
+    <button class="ab" onclick="openM('quests')">📜 Misiones [Q]</button>
+    <button class="ab" onclick="openM('achievements')">🏆 Logros</button>
+    <button class="ab" onclick="openM('shop')">🛒 Tienda</button>
+    <button class="ab" onclick="openM('forge')">⚒️ Forja</button>
+    <button class="ab" onclick="openM('talent')">🌟 Talentos</button>
+    <button class="ab" onclick="openM('guild')">🛡️ Guild</button>
+    <button class="ab" onclick="openM('ranking')">🏅 Ranking</button>
+    <button class="ab" onclick="openM('teleport')">🌌 Viajar [T]</button>
+    <button class="ab" onclick="toggleChat()">💬 Chat [C]</button>
+    <button class="ab" onclick="togglePet()">🐾 Mascota [P]</button>
+    <button class="ab" onclick="toggleMount()">🐎 Montura [M]</button>
+    <button class="ab" onclick="openM('daily')">🎁 Recompensa</button>
+  </div>
+
+  <div class="ghud" id="ghud">💰 0</div>
+  <div id="hotbar"></div>
+  <div id="clog"></div>
+
+  <div id="chat">
+    <div id="chat-msgs"></div>
+    <input id="chat-in" placeholder="Escribe y presiona Enter…" onkeydown="if(event.key==='Enter')sendChat()">
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal" id="m-inventory"><div class="mbox"><span class="mc" onclick="closeM('inventory')">✕</span><div class="mt">🎒 Inventario</div><div id="inv-c"></div></div></div>
+<div class="modal" id="m-quests"><div class="mbox"><span class="mc" onclick="closeM('quests')">✕</span><div class="mt">📜 Misiones</div><div id="quest-c"></div></div></div>
+<div class="modal" id="m-shop"><div class="mbox"><span class="mc" onclick="closeM('shop')">✕</span><div class="mt">🛒 Tienda del Mercader</div><div id="shop-c"></div></div></div>
+<div class="modal" id="m-forge"><div class="mbox"><span class="mc" onclick="closeM('forge')">✕</span><div class="mt">⚒️ Forja de Dragón</div><div id="forge-c"></div></div></div>
+<div class="modal" id="m-stats"><div class="mbox"><span class="mc" onclick="closeM('stats')">✕</span><div class="mt">📊 Personaje</div><div id="stats-c"></div></div></div>
+<div class="modal" id="m-talent"><div class="mbox"><span class="mc" onclick="closeM('talent')">✕</span><div class="mt">🌟 Árbol de Talentos</div><div id="talent-c"></div></div></div>
+<div class="modal" id="m-achievements"><div class="mbox"><span class="mc" onclick="closeM('achievements')">✕</span><div class="mt">🏆 Logros</div><div id="ach-c"></div></div></div>
+<div class="modal" id="m-guild"><div class="mbox"><span class="mc" onclick="closeM('guild')">✕</span><div class="mt">🛡️ Guild</div><div id="guild-c"></div></div></div>
+<div class="modal" id="m-ranking"><div class="mbox"><span class="mc" onclick="closeM('ranking')">✕</span><div class="mt">🏅 Ranking Global</div><div id="rank-c"></div></div></div>
+<div class="modal" id="m-teleport">
+  <div class="mbox" style="width:min(900px,96vw);">
+    <span class="mc" onclick="closeM('teleport')">✕</span>
+    <div class="mt">🌌 Portales del Mundo — Elige tu Destino</div>
+    <div style="font-size:.75rem;color:var(--muted);text-align:center;margin-bottom:14px;letter-spacing:.06em;">Cada portal te lleva a un mundo único. Elige con sabiduría, viajero.</div>
+    <div class="portal-grid" id="tp-c"></div>
+  </div>
+</div>
+<div class="modal" id="m-daily"><div class="mbox"><span class="mc" onclick="closeM('daily')">✕</span><div class="mt">🎁 Recompensas Diarias</div><div id="daily-c"></div></div></div>
+
+<!-- OVERLAYS -->
+<div id="bwarn"><div class="bwt" id="bwt">⚠ JEFE ⚠</div></div>
+<div id="lvfl"></div>
+<div id="toasts"></div>
+<div id="end">
+  <div class="et" id="et"></div>
+  <div class="estats" id="estats"></div>
+  <button class="btn" onclick="backToTitle()" style="max-width:210px;">↺ Nueva Aventura</button>
+</div>
+
+<script>
+// ══════════════════ CONSTANTS ══════════════════
+const T = 52;
+
+const CLASS_SVG_IDS = ['hero-guerrero','hero-mago','hero-arquero','hero-chaman'];
+
+const CLASSES = [
+  {name:'Guerrero', icon:'⚔️', svgId:'hero-guerrero', hp:220, mp:100, atkM:1.2, defM:1.5, crit:.12, mpR:3,  col:'#c9a84c'},
+  {name:'Mago',     icon:'🔮', svgId:'hero-mago',     hp:150, mp:210, atkM:1.65,defM:.8,  crit:.18, mpR:6,  col:'#3366ff'},
+  {name:'Arquero',  icon:'🏹', svgId:'hero-arquero',  hp:175, mp:135, atkM:1.35,defM:1.0, crit:.28, mpR:4,  col:'#44bb44'},
+  {name:'Chamán',   icon:'🌿', svgId:'hero-chaman',   hp:190, mp:175, atkM:1.1, defM:1.1, crit:.14, mpR:5,  col:'#aa44ff'},
+];
+
+// Portal world art data (SVG backgrounds for each world)
+const WORLD_ART = {
+  bosque_oscuro:   {bg:'#0a1408', stars:'#44bb44', mood:'forest',  gradient:['#0a1408','#1a2c10','#0d1a0a'], accent:'#44ff88'},
+  desierto_eterno: {bg:'#2a1804', stars:'#ff8800', mood:'desert',  gradient:['#2a1804','#4a2c08','#1a1004'], accent:'#ffaa44'},
+  dungeon_abismo:  {bg:'#050508', stars:'#4466ff', mood:'dungeon', gradient:['#050508','#0d0d14','#030308'], accent:'#4466ff'},
+  montanas_nevadas:{bg:'#0a1218', stars:'#88ddff', mood:'snow',    gradient:['#0a1218','#162230','#080e14'], accent:'#88ddff'},
+  ciudad_fantasma: {bg:'#0d0d0a', stars:'#aaaaaa', mood:'ghost',   gradient:['#0d0d0a','#181814','#0a0a08'], accent:'#ccccaa'},
+  templo_sagrado:  {bg:'#180e04', stars:'#f0d070', mood:'temple',  gradient:['#180e04','#2a1808','#100904'], accent:'#f0d070'},
+  volcan_eterno:   {bg:'#180400', stars:'#ff4400', mood:'volcano', gradient:['#180400','#2a0800','#100200'], accent:'#ff6622'},
+  pantano_maldito: {bg:'#080e04', stars:'#44aa44', mood:'swamp',   gradient:['#080e04','#101804','#060c02'], accent:'#88ff44'},
+};
+
+const MAPS = {
+  bosque_oscuro:   {name:'Bosque Oscuro',      w:26,h:20,floor:'#2c3c1c',wall:'#1c2e0c',deco:'🌲',danger:1,wx:'clear',safe:false},
+  desierto_eterno: {name:'Desierto Eterno',    w:24,h:18,floor:'#554030',wall:'#3a2810',deco:'🏜️',danger:2,wx:'clear',safe:false},
+  dungeon_abismo:  {name:'Dungeon del Abismo', w:20,h:20,floor:'#181818',wall:'#080808',deco:'🪨',danger:3,wx:'fog',  safe:false},
+  montanas_nevadas:{name:'Montañas Nevadas',   w:24,h:18,floor:'#aec4d4',wall:'#5e7888',deco:'❄️',danger:2,wx:'rain', safe:false},
+  ciudad_fantasma: {name:'Ciudad Fantasma',    w:28,h:16,floor:'#282820',wall:'#181812',deco:'🏛️',danger:4,wx:'fog',  safe:false},
+  templo_sagrado:  {name:'Templo Sagrado',     w:18,h:18,floor:'#d8c8a0',wall:'#887860',deco:'⛪',danger:0,wx:'clear',safe:true},
+  volcan_eterno:   {name:'Volcán Eterno',      w:22,h:22,floor:'#4a1810',wall:'#280808',deco:'🌋',danger:5,wx:'storm',safe:false},
+  pantano_maldito: {name:'Pantano Maldito',    w:24,h:20,floor:'#1c2a14',wall:'#0c1a06',deco:'🌿',danger:3,wx:'fog',  safe:false},
+};
+
+const START_MAPS = ['bosque_oscuro','desierto_eterno','montanas_nevadas','templo_sagrado'];
+
+const SKILLS = [
+  {id:0,  name:'Golpe Básico', icon:'⚔️', dmg:[14,24], cost:0,  cd:.55, type:'atk', col:'#ffe0a0'},
+  {id:1,  name:'Llamarada',    icon:'🔥', dmg:[32,55], cost:24, cd:3.5, type:'atk', col:'#ff4422'},
+  {id:2,  name:'Curación',     icon:'💖', heal:[40,65],cost:20, cd:7,   type:'heal',col:'#44ee88'},
+  {id:3,  name:'Torbellino',   icon:'❄️', dmg:[20,36], cost:32, cd:5,   type:'aoe', col:'#88ddff'},
+  {id:4,  name:'Rayo',         icon:'⚡', dmg:[50,80], cost:48, cd:9,   type:'atk', col:'#ffee44'},
+  {id:5,  name:'Escudo',       icon:'🛡️', buff:'shield',cost:26,cd:15,  type:'buff',col:'#aaccff'},
+  {id:6,  name:'Explosión',    icon:'☄️', dmg:[26,44], cost:36, cd:6.5, type:'aoe', col:'#ff8800'},
+  {id:7,  name:'Veneno',       icon:'🏹', dmg:[12,20], cost:18, cd:4,   type:'dot', col:'#88ff44'},
+  {id:8,  name:'Sombra',       icon:'🌑', dmg:[35,58], cost:40, cd:8,   type:'aoe', col:'#6644aa'},
+  {id:9,  name:'Titán',        icon:'👊', dmg:[60,95], cost:58, cd:13,  type:'atk', col:'#ffaa00'},
+  {id:10, name:'Divino',       icon:'✨', heal:[22,38],cost:14, cd:10,  type:'heal',col:'#fffacc'},
+  {id:11, name:'Cataclismo',   icon:'🌋', dmg:[80,130],cost:80, cd:20,  type:'aoe', col:'#ff2200'},
+];
+
+// Map enemies to SVG IDs
+const ENEMY_SVG = {
+  'Goblin':'enemy-goblin','Esqueleto':'enemy-esqueleto','Lobo Alfa':'enemy-lobo',
+  'Gnoll':'enemy-goblin','Nigromante':'enemy-esqueleto','Drake':'enemy-lobo',
+  'Metin Rojo':'enemy-metin','Dragón Espectral':'enemy-dragon','Lich Rey':'enemy-lich'
+};
+
+const ENEMIES = [
+  {name:'Goblin',          svgId:'enemy-goblin',    hp:60,  atk:[8,18],  xp:25,  spd:1.4, col:'#44bb44',lv:1,gold:[4,10], drop:.65},
+  {name:'Esqueleto',       svgId:'enemy-esqueleto', hp:100, atk:[14,26], xp:42,  spd:.9,  col:'#ccccaa',lv:2,gold:[8,16], drop:.60},
+  {name:'Lobo Alfa',       svgId:'enemy-lobo',      hp:145, atk:[22,38], xp:62,  spd:1.7, col:'#8844cc',lv:3,gold:[12,22],drop:.55},
+  {name:'Gnoll',           svgId:'enemy-goblin',    hp:90,  atk:[18,32], xp:50,  spd:1.2, col:'#cc8844',lv:3,gold:[10,18],drop:.58},
+  {name:'Nigromante',      svgId:'enemy-esqueleto', hp:175, atk:[28,46], xp:88,  spd:.85, col:'#6666aa',lv:5,gold:[20,35],drop:.60},
+  {name:'Drake',           svgId:'enemy-lobo',      hp:220, atk:[35,58], xp:115, spd:1.1, col:'#44cccc',lv:6,gold:[28,48],drop:.62},
+  {name:'Metin Rojo',      svgId:'enemy-metin',     hp:500, atk:[40,70], xp:220, spd:.5,  col:'#ff4422',lv:5,gold:[80,140],drop:.95,boss:true},
+  {name:'Dragón Espectral',svgId:'enemy-dragon',    hp:900, atk:[65,110],xp:520, spd:1.0, col:'#aa44ff',lv:9,gold:[200,380],drop:.95,boss:true},
+  {name:'Lich Rey',        svgId:'enemy-lich',      hp:1400,atk:[85,140],xp:900, spd:.7,  col:'#ffffff',lv:13,gold:[400,700],drop:.98,boss:true},
+];
+
+const SHOP_ITEMS = [
+  {name:'Espada de Fuego',   icon:'🗡️',type:'weapon',    atk:18,price:120,rarity:'rare'},
+  {name:'Armadura de Hierro',icon:'🛡️',type:'armor',     def:12,price:100,rarity:'rare'},
+  {name:'Báculo Arcano',     icon:'🪄',type:'weapon',    atk:28,magic:true,price:200,rarity:'epic'},
+  {name:'Poción de Vida',    icon:'🧪',type:'consumable',heal:80,price:30,rarity:'common'},
+  {name:'Élixir de Maná',    icon:'💧',type:'consumable',mp:60,price:35,rarity:'common'},
+  {name:'Orbe de XP',        icon:'🔮',type:'consumable',xpGain:200,price:150,rarity:'epic'},
+  {name:'Amuleto Crítico',   icon:'💎',type:'accessory', crit:.1,price:250,rarity:'epic'},
+  {name:'Botas del Viento',  icon:'👟',type:'accessory', spdBonus:25,price:180,rarity:'rare'},
+  {name:'Corona Legendaria', icon:'👑',type:'helm',      def:20,atk:10,price:800,rarity:'legend'},
+  {name:'Poción Grande',     icon:'🍶',type:'consumable',heal:200,price:80,rarity:'rare'},
+  {name:'Escudo Diamante',   icon:'🔷',type:'armor',     def:25,price:350,rarity:'epic'},
+  {name:'Arco de Sombra',    icon:'🏹',type:'weapon',    atk:22,crit:.08,price:280,rarity:'epic'},
+];
+
+const FORGE_RECIPES = [
+  {name:'Espada Llameante',  mats:[0,1], result:{name:'Espada Llameante', icon:'⚔️',type:'weapon',atk:45,rarity:'epic'}},
+  {name:'Bastón de Truenos', mats:[2,4], result:{name:'Bastón de Truenos',icon:'⚡',type:'weapon',atk:70,magic:true,rarity:'legend'}},
+  {name:'Armadura Celestial',mats:[1,8], result:{name:'Armadura Celestial',icon:'🌌',type:'armor',def:38,rarity:'legend'}},
+];
+
+const ACHIEVEMENTS_DB = [
+  {id:0,name:'Primera Sangre',  desc:'Derrota tu primer enemigo',icon:'⚔️',cond:p=>p.kills>=1,    title:'Iniciado'},
+  {id:1,name:'Cazador',         desc:'Derrota 25 enemigos',     icon:'🎯',cond:p=>p.kills>=25,   title:'Cazador'},
+  {id:2,name:'Leyenda',         desc:'Llega al nivel 10',       icon:'🌟',cond:p=>p.level>=10,   title:'Leyenda'},
+  {id:3,name:'Matadragones',    desc:'Derrota un jefe',         icon:'🐉',cond:p=>p.bossKills>=1,title:'Matadragones'},
+  {id:4,name:'Ricachón',        desc:'Acumula 1000 de oro',     icon:'💰',cond:p=>p.gold>=1000,  title:'Mercader'},
+  {id:5,name:'Combo Maestro',   desc:'Alcanza combo x8',        icon:'💥',cond:p=>p.maxCombo>=8, title:'Combo Master'},
+  {id:6,name:'Superviviente',   desc:'Llega al nivel 15',       icon:'🛡️',cond:p=>p.level>=15,   title:'Superviviente'},
+];
+
+const DAILY_REWARDS = [
+  {day:1,icon:'🧪',label:'+Poción',     type:'item',   item:{name:'Poción de Vida',icon:'🧪',type:'consumable',heal:80,rarity:'common'}},
+  {day:2,icon:'💰',label:'+150 Oro',    type:'gold',   amount:150},
+  {day:3,icon:'🔮',label:'+Orbe XP',    type:'item',   item:{name:'Orbe de XP',icon:'🔮',type:'consumable',xpGain:200,rarity:'epic'}},
+  {day:4,icon:'💎',label:'+500 Oro',    type:'gold',   amount:500},
+  {day:5,icon:'💎',label:'Ítem Épico',  type:'item',   item:{name:'Amuleto Crítico',icon:'💎',type:'accessory',crit:.1,rarity:'epic'}},
+  {day:6,icon:'⚡',label:'+1000 XP',    type:'xp',     amount:1000},
+  {day:7,icon:'👑',label:'Legendario',  type:'item',   item:{name:'Corona Legendaria',icon:'👑',type:'helm',def:20,atk:10,rarity:'legend'}},
+];
+
+const RANK_FAKE = [
+  {name:'ShadowKing',lv:15,score:8420,cls:'Mago'},
+  {name:'Thorak',    lv:12,score:6330,cls:'Guerrero'},
+  {name:'LunaBlade', lv:9, score:4890,cls:'Arquero'},
+  {name:'ElvenMystic',lv:7,score:3210,cls:'Chamán'},
+  {name:'Ironforge', lv:6, score:2140,cls:'Guerrero'},
+];
+
+const FAKE_PLAYERS = [
+  {name:'LunaBlade',  svgId:'hero-arquero',  map:'bosque_oscuro',   px:680,py:440,level:7, col:'#ff88cc'},
+  {name:'Thorak',     svgId:'hero-guerrero', map:'desierto_eterno', px:360,py:500,level:12,col:'#44aaff'},
+  {name:'ElvenMystic',svgId:'hero-chaman',   map:'bosque_oscuro',   px:920,py:310,level:5, col:'#88ff88'},
+  {name:'ShadowKing', svgId:'hero-mago',     map:'dungeon_abismo',  px:210,py:760,level:15,col:'#aa44ff'},
+  {name:'Ironforge',  svgId:'hero-guerrero', map:'bosque_oscuro',   px:450,py:600,level:9, col:'#ffaa44'},
+];
+
+// Pre-render SVG to image cache
+const SVG_CACHE = {};
+
+function svgSymbolToImage(symbolId, w, h) {
+  return new Promise(resolve => {
+    if (SVG_CACHE[symbolId]) { resolve(SVG_CACHE[symbolId]); return; }
+    const sym = document.getElementById(symbolId) || document.querySelector('#svgDefs symbol[id="'+symbolId+'"]') || document.querySelector('symbol#'+symbolId);
+    if (!sym) { resolve(null); return; }
+    const vb = sym.getAttribute('viewBox') || '0 0 '+w+' '+h;
+    const inner = sym.innerHTML;
+    const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="${vb}">${inner}</svg>`;
+    const blob = new Blob([svgStr], {type:'image/svg+xml'});
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = () => { SVG_CACHE[symbolId] = img; URL.revokeObjectURL(url); resolve(img); };
+    img.onerror = () => { resolve(null); };
+    img.src = url;
+  });
+}
+
+// Preload all SVG images
+async function preloadSVGs() {
+  const ids = [
+    'hero-guerrero','hero-mago','hero-arquero','hero-chaman',
+    'enemy-goblin','enemy-esqueleto','enemy-lobo',
+    'enemy-metin','enemy-dragon','enemy-lich'
+  ];
+  for (const id of ids) await svgSymbolToImage(id, 80, 90);
+}
+
+// ══════════════════ GAME STATE ══════════════════
+let G = null;
+let selCls = 0, selWorld = 'bosque_oscuro', pendingMode = 'nueva';
+let lastT = 0, shakeAmt = 0;
+let stars = [], wxParts = [], cdTimers = {}, logLines = [];
+
+// ══════════════════ CANVAS SETUP ══════════════════
+const cvBg = document.getElementById('cBg');
+const cvW  = document.getElementById('cW');
+const cvFx = document.getElementById('cFx');
+const cvWx = document.getElementById('cWx');
+const ctxBg = cvBg.getContext('2d');
+const ctxW  = cvW.getContext('2d');
+const ctxFx = cvFx.getContext('2d');
+const ctxWx = cvWx.getContext('2d');
+
+function resizeAll() {
+  const w = window.innerWidth, h = window.innerHeight;
+  [cvBg,cvW,cvFx,cvWx].forEach(c => { c.width = w; c.height = h; });
+  stars = [];
+  for (let i = 0; i < 200; i++)
+    stars.push({x:Math.random()*w, y:Math.random()*h, r:.5+Math.random()*1.6, a:Math.random()*6.28, s:.003+Math.random()*.013});
+}
+window.addEventListener('resize', resizeAll);
+resizeAll();
+
+// Title particles
+(function(){
+  const c = document.getElementById('tparts');
+  for(let i=0;i<55;i++){
+    const el=document.createElement('div');
+    el.className='tp';
+    const sz=2+Math.random()*5;
+    el.style.cssText='width:'+sz+'px;height:'+sz+'px;left:'+Math.round(Math.random()*100)+'%;bottom:'+Math.round(Math.random()*15)+'%;'
+      +'background:'+(Math.random()<.5?'#c9a84c':'#f0d070')+';'
+      +'animation-duration:'+(4+Math.random()*9)+'s;animation-delay:'+(Math.random()*7)+'s;';
+    c.appendChild(el);
+  }
+})();
+
+// ══════════════════ NAVIGATION ══════════════════
+function goPhase(id, mode) {
+  if (mode) pendingMode = mode;
+  document.querySelectorAll('.phase').forEach(p => p.classList.remove('on'));
+  const key = typeof id === 'number' ? 'ph'+id : 'ph-'+id;
+  const el = document.getElementById(key);
+  if (el) el.classList.add('on');
+  if (id === 'rank') buildRankTitle();
+}
+
+// Build class cards with SVG
+(function(){
+  const g = document.getElementById('cls-grid');
+  CLASSES.forEach((c,i) => {
+    const d = document.createElement('div');
+    d.className = 'ccard';
+    d.innerHTML = '<svg class="ccard-svg" viewBox="0 0 72 80"><use href="#'+c.svgId+'"/></svg>'
+      + '<div class="cn">'+c.name+'</div>'
+      + '<div class="cd">HP:'+c.hp+' MP:'+c.mp+'<br>Crít:'+(c.crit*100|0)+'%</div>';
+    d.onclick = function(){
+      document.querySelectorAll('.ccard').forEach(x=>x.classList.remove('on'));
+      d.classList.add('on'); selCls=i;
+      document.getElementById('btn-cls').disabled=false;
+    };
+    g.appendChild(d);
+  });
+})();
+
+// World art SVG generator per mood
+function mkWorldSVG(key, w, h) {
+  const art = WORLD_ART[key] || WORLD_ART.bosque_oscuro;
+  const m = MAPS[key];
+  const mood = art.mood;
+  let content = '';
+
+  // Background gradient
+  const [bg1,bg2,bg3] = art.gradient;
+
+  if (mood === 'forest') {
+    content = `
+      <defs><linearGradient id="fg${key}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${bg1}"/>
+        <stop offset="100%" stop-color="${bg2}"/>
+      </linearGradient></defs>
+      <rect width="${w}" height="${h}" fill="url(#fg${key})"/>
+      <!-- moon -->
+      <circle cx="${w*.7}" cy="${h*.18}" r="12" fill="#c8d890" opacity=".7"/>
+      <!-- far trees -->
+      ${[...Array(6)].map((_,i)=>{const x=i*w/5.5+10; return `<path d="M${x} ${h} L${x} ${h*.4} L${x-8} ${h*.4} L${x} ${h*.15} L${x+8} ${h*.4} L${x+16} ${h*.4} L${x} ${h}" fill="#1a2a10" opacity=".6"/>`}).join('')}
+      <!-- near trees dark -->
+      ${[...Array(4)].map((_,i)=>{const x=i*w/3.2+5;const th=h*.28; return `<path d="M${x} ${h} L${x} ${h*.55} L${x-12} ${h*.55} L${x} ${th} L${x+12} ${h*.55} L${x+24} ${h*.55} L${x+12} ${h}" fill="#0d1a06"/>`}).join('')}
+      <!-- fireflies -->
+      ${[...Array(8)].map((_,i)=>`<circle cx="${20+i*w/8.5}" cy="${h*.3+Math.sin(i)*20}" r="1.5" fill="#88ff44" opacity=".7"/>`).join('')}
+      <!-- fog ground -->
+      <ellipse cx="${w/2}" cy="${h}" rx="${w*.6}" ry="20" fill="#44ff88" opacity=".06"/>
+    `;
+  } else if (mood === 'desert') {
+    content = `
+      <defs><linearGradient id="fg${key}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#1a0a00"/>
+        <stop offset="60%" stop-color="#3a1c04"/>
+        <stop offset="100%" stop-color="#5a2c08"/>
+      </linearGradient></defs>
+      <rect width="${w}" height="${h}" fill="url(#fg${key})"/>
+      <!-- big moon desert -->
+      <circle cx="${w*.6}" cy="${h*.22}" r="18" fill="#ffcc66" opacity=".8"/>
+      <circle cx="${w*.6}" cy="${h*.22}" r="15" fill="#ffaa44" opacity=".6"/>
+      <!-- dunes -->
+      <path d="M0 ${h} Q${w*.25} ${h*.55} ${w*.5} ${h*.65} Q${w*.75} ${h*.55} ${w} ${h*.6} L${w} ${h}Z" fill="#3a1c04" opacity=".9"/>
+      <path d="M0 ${h} Q${w*.2} ${h*.68} ${w*.45} ${h*.72} Q${w*.7} ${h*.65} ${w} ${h*.7} L${w} ${h}Z" fill="#4a2808" opacity=".8"/>
+      <!-- cactus -->
+      <rect x="${w*.15}" y="${h*.45}" width="5" height="${h*.3}" rx="2" fill="#1a4408" opacity=".7"/>
+      <rect x="${w*.12}" y="${h*.52}" width="12" height="4" rx="2" fill="#1a4408" opacity=".7"/>
+      <!-- stars -->
+      ${[...Array(12)].map((_,i)=>`<circle cx="${10+i*w/12.5}" cy="${5+Math.sin(i*1.3)*20}" r="${.8+Math.random()}" fill="#ffcc88" opacity=".6"/>`).join('')}
+    `;
+  } else if (mood === 'dungeon') {
+    content = `
+      <defs><linearGradient id="fg${key}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#000000"/>
+        <stop offset="100%" stop-color="#0a0a18"/>
+      </linearGradient></defs>
+      <rect width="${w}" height="${h}" fill="url(#fg${key})"/>
+      <!-- stone walls pattern -->
+      ${[...Array(4)].map((_,r)=>[...Array(3)].map((_,c)=>`<rect x="${c*w/2.8+5}" y="${r*h/3.8+8}" width="${w/3.2}" height="${h/4.5}" rx="2" fill="none" stroke="#1a1a30" stroke-width="1.5" opacity=".5"/>`).join('')).join('')}
+      <!-- torches -->
+      <rect x="${w*.15}" y="${h*.4}" width="4" height="12" rx="1" fill="#5a3008"/>
+      <path d="M${w*.17} ${h*.4} Q${w*.14} ${h*.3} ${w*.17} ${h*.25} Q${w*.2} ${h*.3} ${w*.17} ${h*.4}" fill="#ff6622" opacity=".8"/>
+      <rect x="${w*.75}" y="${h*.4}" width="4" height="12" rx="1" fill="#5a3008"/>
+      <path d="M${w*.77} ${h*.4} Q${w*.74} ${h*.3} ${w*.77} ${h*.25} Q${w*.8} ${h*.3} ${w*.77} ${h*.4}" fill="#ff6622" opacity=".8"/>
+      <!-- blue glowing orb -->
+      <circle cx="${w/2}" cy="${h*.35}" r="20" fill="#0022aa" opacity=".25"/>
+      <circle cx="${w/2}" cy="${h*.35}" r="10" fill="#1133cc" opacity=".35"/>
+      <circle cx="${w/2}" cy="${h*.35}" r="5" fill="#4466ff" opacity=".7"/>
+      <!-- floor tiles -->
+      <path d="M0 ${h*.75} L${w} ${h*.75}" stroke="#111122" stroke-width="1" opacity=".5"/>
+    `;
+  } else if (mood === 'snow') {
+    content = `
+      <defs><linearGradient id="fg${key}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#060c14"/>
+        <stop offset="60%" stop-color="#0c1828"/>
+        <stop offset="100%" stop-color="#142238"/>
+      </linearGradient></defs>
+      <rect width="${w}" height="${h}" fill="url(#fg${key})"/>
+      <!-- aurora -->
+      <path d="M0 ${h*.3} Q${w*.3} ${h*.15} ${w*.6} ${h*.25} Q${w*.8} ${h*.18} ${w} ${h*.3}" fill="none" stroke="#44ffcc" stroke-width="8" opacity=".12"/>
+      <path d="M0 ${h*.38} Q${w*.25} ${h*.22} ${w*.55} ${h*.32} Q${w*.8} ${h*.24} ${w} ${h*.36}" fill="none" stroke="#88ddff" stroke-width="5" opacity=".1"/>
+      <!-- mountains -->
+      <path d="M0 ${h} L${w*.12} ${h*.35} L${w*.24} ${h*.55} L${w*.38} ${h*.22} L${w*.52} ${h*.5} L${w*.65} ${h*.3} L${w*.78} ${h*.48} L${w*.9} ${h*.28} L${w} ${h*.5} L${w} ${h}Z" fill="#0a1828" opacity=".9"/>
+      <!-- snow caps -->
+      <path d="M${w*.38} ${h*.22} L${w*.32} ${h*.38} L${w*.44} ${h*.38}Z" fill="#d0e8f8" opacity=".6"/>
+      <path d="M${w*.65} ${h*.3} L${w*.59} ${h*.44} L${w*.71} ${h*.44}Z" fill="#d0e8f8" opacity=".6"/>
+      <!-- snowflakes -->
+      ${[...Array(10)].map((_,i)=>`<circle cx="${i*w/10+5}" cy="${10+Math.sin(i)*15}" r="1" fill="#88ddff" opacity=".7"/>`).join('')}
+    `;
+  } else if (mood === 'ghost') {
+    content = `
+      <defs><linearGradient id="fg${key}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#0a0a08"/>
+        <stop offset="100%" stop-color="#181814"/>
+      </linearGradient></defs>
+      <rect width="${w}" height="${h}" fill="url(#fg${key})"/>
+      <!-- dead trees -->
+      <path d="M${w*.1} ${h} L${w*.1} ${h*.3} M${w*.1} ${h*.5} L${w*.05} ${h*.35} M${w*.1} ${h*.45} L${w*.16} ${h*.32}" stroke="#222218" stroke-width="3" stroke-linecap="round" fill="none"/>
+      <path d="M${w*.85} ${h} L${w*.85} ${h*.28} M${w*.85} ${h*.48} L${w*.78} ${h*.33} M${w*.85} ${h*.42} L${w*.91} ${h*.3}" stroke="#222218" stroke-width="3" stroke-linecap="round" fill="none"/>
+      <!-- ghost wisps -->
+      <circle cx="${w*.3}" cy="${h*.4}" r="12" fill="#aaaaaa" opacity=".08"/>
+      <ellipse cx="${w*.3}" cy="${h*.45}" rx="7" ry="10" fill="#cccccc" opacity=".06"/>
+      <circle cx="${w*.7}" cy="${h*.35}" r="10" fill="#aaaaaa" opacity=".07"/>
+      <!-- broken building -->
+      <rect x="${w*.35}" y="${h*.45}" width="${w*.3}" height="${h*.4}" fill="#111110" stroke="#222" stroke-width="1"/>
+      <rect x="${w*.4}" y="${h*.38}" width="${w*.08}" height="${h*.15}" fill="#111" stroke="#222" stroke-width="1"/>
+      <!-- moon pale -->
+      <circle cx="${w*.5}" cy="${h*.2}" r="14" fill="#ddddcc" opacity=".4"/>
+      <!-- fog -->
+      <ellipse cx="${w/2}" cy="${h*.88}" rx="${w*.6}" ry="18" fill="#aaaaaa" opacity=".06"/>
+    `;
+  } else if (mood === 'temple') {
+    content = `
+      <defs><linearGradient id="fg${key}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#100a02"/>
+        <stop offset="100%" stop-color="#2a1a06"/>
+      </linearGradient></defs>
+      <rect width="${w}" height="${h}" fill="url(#fg${key})"/>
+      <!-- golden sun -->
+      <circle cx="${w/2}" cy="${h*.22}" r="22" fill="#f0d070" opacity=".5"/>
+      <circle cx="${w/2}" cy="${h*.22}" r="14" fill="#ffee88" opacity=".6"/>
+      ${[...Array(12)].map((_,i)=>{const a=i*30*Math.PI/180; return `<line x1="${w/2}" y1="${h*.22}" x2="${w/2+Math.cos(a)*32}" y2="${h*.22+Math.sin(a)*32}" stroke="#f0d070" stroke-width="1.5" opacity=".3"/>`}).join('')}
+      <!-- pillars -->
+      <rect x="${w*.12}" y="${h*.35}" width="12" height="${h*.65}" fill="#3a2808" stroke="#c9a84c" stroke-width="1" opacity=".7"/>
+      <rect x="${w*.75}" y="${h*.35}" width="12" height="${h*.65}" fill="#3a2808" stroke="#c9a84c" stroke-width="1" opacity=".7"/>
+      <!-- altar -->
+      <rect x="${w*.3}" y="${h*.62}" width="${w*.4}" height="${h*.38}" fill="#2a1a06" stroke="#c9a84c" stroke-width="1.5" opacity=".8"/>
+      <rect x="${w*.35}" y="${h*.55}" width="${w*.3}" height="${h*.12}" fill="#3a2810" stroke="#c9a84c" stroke-width="1" opacity=".7"/>
+      <!-- divine light -->
+      <path d="M${w/2} 0 L${w*.42} ${h*.6} L${w*.58} ${h*.6}Z" fill="#f0d070" opacity=".04"/>
+    `;
+  } else if (mood === 'volcano') {
+    content = `
+      <defs><linearGradient id="fg${key}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#0a0000"/>
+        <stop offset="50%" stop-color="#200400"/>
+        <stop offset="100%" stop-color="#3a0800"/>
+      </linearGradient></defs>
+      <rect width="${w}" height="${h}" fill="url(#fg${key})"/>
+      <!-- volcano -->
+      <path d="M0 ${h} L${w*.3} ${h*.35} L${w*.5} ${h*.15} L${w*.7} ${h*.35} L${w} ${h}Z" fill="#200400" opacity=".9"/>
+      <!-- lava glow top -->
+      <ellipse cx="${w*.5}" cy="${h*.15}" rx="18" ry="10" fill="#ff4400" opacity=".5"/>
+      <ellipse cx="${w*.5}" cy="${h*.15}" rx="10" ry="6" fill="#ff6600" opacity=".7"/>
+      <!-- lava flows -->
+      <path d="M${w*.45} ${h*.15} Q${w*.38} ${h*.4} ${w*.3} ${h*.65}" stroke="#ff4400" stroke-width="5" opacity=".4" fill="none"/>
+      <path d="M${w*.55} ${h*.15} Q${w*.62} ${h*.4} ${w*.7} ${h*.6}" stroke="#ff3300" stroke-width="4" opacity=".35" fill="none"/>
+      <!-- embers -->
+      ${[...Array(10)].map((_,i)=>`<circle cx="${w*.3+i*w*.04}" cy="${h*.1+Math.sin(i)*18}" r="${1+Math.random()}" fill="#ff6600" opacity=".7"/>`).join('')}
+      <!-- sky glow -->
+      <ellipse cx="${w/2}" cy="0" rx="${w*.5}" ry="${h*.3}" fill="#ff2200" opacity=".06"/>
+    `;
+  } else if (mood === 'swamp') {
+    content = `
+      <defs><linearGradient id="fg${key}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#030804"/>
+        <stop offset="100%" stop-color="#0c1808"/>
+      </linearGradient></defs>
+      <rect width="${w}" height="${h}" fill="url(#fg${key})"/>
+      <!-- murky water -->
+      <rect x="0" y="${h*.6}" width="${w}" height="${h*.4}" fill="#0a1404" opacity=".9"/>
+      <!-- water shimmer -->
+      ${[...Array(5)].map((_,i)=>`<path d="M${i*w/4.5} ${h*.75} Q${i*w/4.5+20} ${h*.73} ${i*w/4.5+40} ${h*.75}" stroke="#44aa44" stroke-width=".8" fill="none" opacity=".25"/>`).join('')}
+      <!-- dead trees murky -->
+      ${[...Array(4)].map((_,i)=>`<path d="M${w*.1+i*w*.27} ${h} L${w*.1+i*w*.27} ${h*.28} M${w*.1+i*w*.27} ${h*.48} L${w*.06+i*w*.27} ${h*.34}" stroke="#1a2a0a" stroke-width="3.5" stroke-linecap="round" fill="none" opacity=".8"/>`).join('')}
+      <!-- evil will-o-wisps -->
+      <circle cx="${w*.25}" cy="${h*.45}" r="8" fill="#44ff88" opacity=".15"/>
+      <circle cx="${w*.25}" cy="${h*.45}" r="4" fill="#44ff88" opacity=".3"/>
+      <circle cx="${w*.7}" cy="${h*.38}" r="6" fill="#88ff44" opacity=".2"/>
+      <!-- toxic bubbles -->
+      ${[...Array(6)].map((_,i)=>`<circle cx="${w*.1+i*w*.15}" cy="${h*.65+Math.sin(i)*.05}" r="${1.5+i*.5}" fill="#44aa22" opacity=".4"/>`).join('')}
+    `;
+  }
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${content}</svg>`;
+}
+
+// Build world selection cards
+(function(){
+  const g = document.getElementById('world-grid');
+  START_MAPS.forEach(k => {
+    const m = MAPS[k];
+    const d = document.createElement('div');
+    d.className = 'wcard';
+    const art = WORLD_ART[k];
+    const svgArt = mkWorldSVG(k, 100, 70);
+    const svgUrl = 'data:image/svg+xml,' + encodeURIComponent(svgArt);
+    d.innerHTML = '<img class="wcard-art" src="' + svgUrl + '" style="border-radius:4px;"/>'
+      + '<div style="font-family:Cinzel,serif;font-size:.8rem;color:var(--gold)">' + m.name + '</div>'
+      + '<div style="font-size:.62rem;color:var(--muted);margin-top:2px">' + (m.safe?'⛪ Zona Segura':'⚔️ Peligro ×'+m.danger) + '</div>';
+    d.onclick = function(){
+      document.querySelectorAll('.wcard').forEach(x=>x.classList.remove('on'));
+      d.classList.add('on'); selWorld=k;
+      document.getElementById('btn-world').disabled=false;
+    };
+    g.appendChild(d);
+  });
+})();
+
+function buildRankTitle(){
+  const medals=['🥇','🥈','🥉','4','5'];
+  document.getElementById('rank-title-list').innerHTML=
+    RANK_FAKE.map((r,i)=>'<div class="rkr"><span class="rkp">'+medals[i]+'</span>'
+      +'<span style="font-family:Cinzel,serif;font-size:.83rem;flex:1">'+r.name+'</span>'
+      +'<span style="color:var(--muted);font-size:.7rem">'+r.cls+'</span>'
+      +'<span style="color:var(--muted);font-size:.7rem;margin-left:6px">Lv'+r.lv+'</span>'
+      +'<span style="color:var(--gold);font-size:.8rem;margin-left:8px">'+r.score+'</span></div>').join('');
+}
+
+function tryLoad(){
+  const s=localStorage.getItem('iaqSave');
+  if(!s){toast('No hay partida guardada');return;}
+  const data=JSON.parse(s);
+  selCls=data.p?data.p.cls:0;
+  selWorld=data.mapKey||'bosque_oscuro';
+  _startGame(data);
+}
+
+// ══════════════════ GAME INIT ══════════════════
+function mkPlayer(){
+  const c=CLASSES[selCls];
+  return{
+    name:localStorage.getItem('iaqName')||'Angelo',
+    cls:selCls,
+    hp:c.hp,maxHp:c.hp,mp:c.mp,maxMp:c.mp,
+    xp:0,xpNext:150,level:1,
+    atkBase:[14,26],def:Math.round(8*c.defM),critChance:c.crit,speed:260,
+    kills:0,bossKills:0,totalDmg:0,maxCombo:0,gold:320,statPts:0,
+    str:10,agi:10,int:10,vit:10,
+    px:T*3+T/2,py:T*3+T/2,
+    inventory:[
+      {name:'Espada Oxidada',icon:'⚔️',type:'weapon',atk:10,rarity:'common',id:1},
+      {name:'Poción x3',icon:'🧪',type:'consumable',heal:60,count:3,rarity:'common',id:2},
+    ],
+    equipped:{weapon:null,armor:null,accessory:null},
+    buffs:[],talents:new Array(12).fill(0),
+    guild:'Los Legendarios',title:'',achievements:new Array(ACHIEVEMENTS_DB.length).fill(false),
+    pet:null,mount:null,
+    attackTarget:null,moveTarget:null,
+  };
+}
+
+function mkMapTiles(m){
+  const tiles=[];
+  for(let y=0;y<m.h;y++){
+    tiles[y]=[];
+    for(let x=0;x<m.w;x++){
+      const edge=x===0||y===0||x===m.w-1||y===m.h-1;
+      tiles[y][x]=edge?2:(Math.random()<.14?1:(Math.random()<.05?3:0));
+    }
+  }
+  return tiles;
+}
+
+function startGame(){_startGame(null);}
+
+function _startGame(savedData){
+  document.getElementById('title').style.display='none';
+  document.getElementById('hud').classList.add('on');
+  const allTiles={};
+  Object.entries(MAPS).forEach(([k,m])=>{allTiles[k]=mkMapTiles(m);});
+  const p=savedData?{...mkPlayer(),...savedData.p,buffs:[],attackTarget:null,moveTarget:null}:mkPlayer();
+  p.px=isFinite(p.px)?p.px:T*3+T/2;
+  p.py=isFinite(p.py)?p.py:T*3+T/2;
+  if(!p.achievements)p.achievements=new Array(ACHIEVEMENTS_DB.length).fill(false);
+  if(!p.bossKills)p.bossKills=0;
+  if(!p.maxCombo)p.maxCombo=0;
+  G={
+    p,allTiles,
+    mapKey:savedData?(savedData.mapKey||selWorld):selWorld,
+    enemies:[],skillCD:new Array(SKILLS.length).fill(0),
+    camX:0,camY:0,t:0,tick:0,running:true,
+    spawnTimer:0,bossTimer:180,
+    weather:'clear',wxTimer:30,
+    combo:0,comboTimer:0,score:0,
+    quests:savedData?savedData.quests:mkQuests(),
+    fakePlayers:FAKE_PLAYERS.map(f=>({...f})),
+    visitedMaps:new Set([savedData?(savedData.mapKey||selWorld):selWorld]),
+  };
+  cvW.style.transform='';
+
+  // Update portrait
+  updatePortrait(p.cls);
+
+  buildHotbar();
+  buildTeleportUI();
+  document.getElementById('mml').textContent=MAPS[G.mapKey].name;
+  for(let i=0;i<5;i++)spawnEnemy();
+  updateHUD();
+  log('🌟 ¡Bienvenido a iAngelo Quest, '+G.p.name+'!','sys');
+  log('Click en enemigos para atacar • WASD / Flechas para mover • 1-0 habilidades','sys');
+  setTimeout(()=>showDailyModal(),1500);
+  setInterval(()=>{if(G&&G.running)saveGame();},30000);
+  startFakeChat();
+  lastT=performance.now();
+  requestAnimationFrame(loop);
+}
+
+function updatePortrait(cls){
+  const port=document.getElementById('port');
+  const c=CLASSES[cls];
+  port.innerHTML='<svg width="48" height="54" viewBox="0 0 72 80"><use href="#'+c.svgId+'"/></svg>';
+}
+
+function mkQuests(){
+  return[
+    {id:0,title:'Limpia el Bosque',   desc:'Mata 10 Goblins',            type:'kill',target:'Goblin',         goal:10,progress:0,reward:{xp:220,gold:100},done:false},
+    {id:1,title:'El Metin Rojo',      desc:'Derrota al Metin Rojo',       type:'boss',target:'Metin Rojo',      goal:1, progress:0,reward:{xp:500,gold:280},done:false},
+    {id:2,title:'Explorador',         desc:'Visita 5 mapas distintos',    type:'map', goal:5, progress:1,reward:{xp:180,gold:80}, done:false},
+    {id:3,title:'Escalada al Poder',  desc:'Llega al nivel 10',           type:'level',goal:10,progress:1,reward:{xp:1000,gold:500},done:false},
+    {id:4,title:'Dragón Caído',       desc:'Derrota al Dragón Espectral', type:'boss',target:'Dragón Espectral',goal:1, progress:0,reward:{xp:1200,gold:600},done:false},
+    {id:5,title:'Acumulador',         desc:'Junta 500 de oro',            type:'gold',goal:500,progress:0,reward:{xp:300,gold:200},done:false},
+    {id:6,title:'Combo Feroz',        desc:'Alcanza combo x8',            type:'combo',goal:8, progress:0,reward:{xp:400,gold:150},done:false},
+  ];
+}
+
+// ══════════════════ MAP CHANGE ══════════════════
+function changeMap(key){
+  if(!G||!MAPS[key])return;
+  G.mapKey=key;
+  G.p.attackTarget=null;G.p.moveTarget=null;
+  G.enemies=[];
+  G.p.px=T*3+T*.5;G.p.py=T*3+T*.5;
+  G.camX=0;G.camY=0;
+  G.weather=MAPS[key].wx||'clear';
+  G.spawnTimer=0;
+  if(!G.visitedMaps.has(key)){G.visitedMaps.add(key);checkQuest('map');}
+  document.getElementById('mml').textContent=MAPS[key].name;
+  if(!MAPS[key].safe)for(let i=0;i<4;i++)spawnEnemy();
+  log('🌌 Has viajado a '+MAPS[key].name,'sys');
+  closeM('teleport');
+}
+
+// ══════════════════ SPAWN ══════════════════
+function spawnEnemy(forceBoss){
+  if(!G)return;
+  const m=MAPS[G.mapKey],tiles=G.allTiles[G.mapKey];
+  let pool=ENEMIES.filter(e=>!e.boss&&e.lv<=G.p.level+3);
+  if(forceBoss)pool=ENEMIES.filter(e=>e.boss&&e.lv<=G.p.level+5);
+  if(!pool.length)pool=[ENEMIES[0]];
+  const type=pool[Math.floor(Math.random()*pool.length)];
+  let x,y,att=0;
+  do{x=2+Math.floor(Math.random()*(m.w-4));y=2+Math.floor(Math.random()*(m.h-4));att++;}
+  while(att<30&&(!tiles[y]||tiles[y][x]!==0));
+  const en={...type,id:Math.random().toString(36).slice(2),
+    hp:type.hp*(1+G.p.level*.07),maxHp:type.hp*(1+G.p.level*.07),
+    px:x*T+T*.5,py:y*T+T*.5,atkTimer:1.5+Math.random(),
+    dead:false,flash:0,wobble:0,dotTimer:0,dotDmg:0};
+  G.enemies.push(en);
+  if(type.boss){showBossWarn(type.name);screenShake(14);}
+}
+
+// ══════════════════ UPDATE ══════════════════
+function update(dt){
+  if(!G||!G.running)return;
+  const p=G.p,mdb=MAPS[G.mapKey],tiles=G.allTiles[G.mapKey];
+  G.t+=dt;G.tick++;G.spawnTimer-=dt;G.comboTimer-=dt;G.bossTimer-=dt;
+  if(G.comboTimer<=0&&G.combo>0){G.combo=0;updateComboUI();}
+  p.mp=Math.min(p.maxMp,p.mp+(mdb.safe?15:CLASSES[p.cls].mpR)*dt);
+  if(mdb.safe)p.hp=Math.min(p.maxHp,p.hp+10*dt);
+  for(let i=0;i<G.skillCD.length;i++)G.skillCD[i]=Math.max(0,G.skillCD[i]-dt);
+  p.buffs=p.buffs.filter(b=>{b.dur-=dt;return b.dur>0;});
+  if(G.spawnTimer<=0&&!mdb.safe&&G.enemies.filter(e=>!e.dead).length<4+p.level){
+    spawnEnemy(false);G.spawnTimer=Math.max(1.5,4-p.level*.1);}
+  if(G.bossTimer<=0&&!mdb.safe){
+    G.bossTimer=150+Math.random()*80;
+    if(p.kills>0)setTimeout(()=>spawnEnemy(true),2200);}
+  if(p.moveTarget){
+    const dx=p.moveTarget.px-p.px,dy=p.moveTarget.py-p.py,d=Math.hypot(dx,dy);
+    if(d<5){p.px=p.moveTarget.px;p.py=p.moveTarget.py;p.moveTarget=null;}
+    else{const s=(p.mount?p.speed*p.mount.spdM:p.speed)*dt;p.px+=dx/d*s;p.py+=dy/d*s;}
+  }
+  if(p.attackTarget&&!p.attackTarget.dead){
+    const en=p.attackTarget;
+    const d=Math.hypot(en.px-p.px,en.py-p.py);
+    if(d>T*1.4){const s=(p.mount?p.speed*p.mount.spdM:p.speed)*dt;p.px+=(en.px-p.px)/d*s;p.py+=(en.py-p.py)/d*s;}
+    else if(G.skillCD[0]<=0)doSkill(0,[en]);
+  }else if(p.attackTarget&&p.attackTarget.dead)p.attackTarget=null;
+  for(const en of G.enemies){
+    if(en.dead)continue;
+    en.flash=Math.max(0,en.flash-dt);en.wobble=Math.max(0,en.wobble-dt);
+    if(en.dotTimer>0){en.dotTimer-=dt;if(G.tick%22===0&&en.hp>0){en.hp-=en.dotDmg;spawnFD(en.px,en.py-T*.5,en.dotDmg,'#88ff44');}}
+    if(!mdb.safe){
+      const dx=p.px-en.px,dy=p.py-en.py,d=Math.hypot(dx,dy);
+      if(d>T*.8){const s=en.spd*65*dt;en.px+=dx/d*s;en.py+=dy/d*s;}
+      en.atkTimer-=dt;
+      if(en.atkTimer<=0&&d<T*1.05){
+        const shld=p.buffs.find(b=>b.type==='shield');
+        let dmg=en.atk[0]+Math.random()*(en.atk[1]-en.atk[0]);
+        dmg=Math.max(1,dmg-p.def);
+        if(shld){shld.dur-=1.5;if(shld.dur<=0)p.buffs=p.buffs.filter(b=>b!==shld);dmg=0;toast('🛡️ Escudo absorbió el golpe!');}
+        p.hp-=dmg;
+        if(dmg>0)spawnFD(p.px,p.py-T*.6,'-'+Math.ceil(dmg),'#ff6666');
+        log(en.name+' te golpea −'+Math.ceil(dmg),'dmg');
+        en.atkTimer=1.4+Math.random();screenShake(3);
+        if(p.hp<=0){p.hp=0;gameOver();return;}
+      }
+    }
+    if(en.hp<=0)killEnemy(en);
+  }
+  G.fakePlayers.forEach(fp=>{fp.px+=(Math.random()*5-2.5);fp.py+=(Math.random()*5-2.5);});
+  G.wxTimer-=dt;
+  if(G.wxTimer<=0){G.weather=mdb.wx||'clear';G.wxTimer=25+Math.random()*30;}
+  drawWeather(dt);
+  const m=MAPS[G.mapKey];
+  const tX=p.px-window.innerWidth/2;
+  const tY=p.py-window.innerHeight/2;
+  const maxX=Math.max(0,m.w*T-window.innerWidth);
+  const maxY=Math.max(0,m.h*T-window.innerHeight);
+  G.camX+=(Math.max(0,Math.min(maxX,tX))-G.camX)*.13;
+  G.camY+=(Math.max(0,Math.min(maxY,tY))-G.camY)*.13;
+  if(!isFinite(G.camX))G.camX=0;
+  if(!isFinite(G.camY))G.camY=0;
+  if(shakeAmt>.4){
+    cvW.style.transform='translate('+((Math.random()-.5)*shakeAmt)+'px,'+((Math.random()-.5)*shakeAmt)+'px)';
+    shakeAmt*=.80;
+  }else{cvW.style.transform='';shakeAmt=0;}
+  checkAchievements();checkQuest('level');checkQuest('gold');
+  updateHUD();drawMinimap();
+}
+
+function screenShake(amt){shakeAmt=Math.max(shakeAmt,amt);}
+
+// ══════════════════ DRAW BG ══════════════════
+function drawBg(ts){
+  ctxBg.fillStyle='#050403';
+  ctxBg.fillRect(0,0,cvBg.width,cvBg.height);
+  for(const s of stars){
+    s.a+=s.s;
+    ctxBg.fillStyle='rgba(225,195,130,'+((.2+.45*Math.abs(Math.sin(s.a)))).toFixed(2)+')';
+    ctxBg.fillRect(s.x,s.y,s.r,s.r);
+  }
+}
+
+// ══════════════════ DRAW WORLD ══════════════════
+function drawWorld(){
+  if(!G||!G.running)return;
+  const{mapKey,camX,camY,p,enemies,fakePlayers,t}=G;
+  const m=MAPS[mapKey],tiles=G.allTiles[mapKey];
+  ctxW.clearRect(0,0,cvW.width,cvW.height);
+  ctxW.save();
+  ctxW.translate(-camX,-camY);
+  // Tiles
+  for(let y=0;y<m.h;y++)for(let x=0;x<m.w;x++){
+    if(!tiles[y])continue;
+    const tile=tiles[y][x];
+    ctxW.fillStyle=tile===0?m.floor:(tile===1?m.wall:'#111');
+    ctxW.fillRect(x*T,y*T,T,T);
+    ctxW.strokeStyle='rgba(0,0,0,.16)';ctxW.lineWidth=.4;ctxW.strokeRect(x*T,y*T,T,T);
+    if(tile===1&&m.deco){ctxW.font='25px serif';ctxW.textAlign='center';ctxW.fillText(m.deco,x*T+T*.5,y*T+T-4);}
+  }
+  // Move target
+  if(p.moveTarget){
+    const pulse=(Math.sin(t*8)+1)*.5;
+    ctxW.beginPath();ctxW.arc(p.moveTarget.px,p.moveTarget.py,7+pulse*3,0,Math.PI*2);
+    ctxW.strokeStyle='rgba(200,170,80,'+(.35+pulse*.45)+')';ctxW.lineWidth=2;ctxW.stroke();
+  }
+  // Fake players (SVG)
+  for(const fp of fakePlayers){
+    if(fp.map!==mapKey)continue;
+    ctxW.save();ctxW.translate(fp.px,fp.py);
+    ctxW.shadowBlur=10;ctxW.shadowColor=fp.col;
+    const img=SVG_CACHE[fp.svgId];
+    if(img){ctxW.drawImage(img,-16,-36,32,36);}
+    else{ctxW.font='22px serif';ctxW.textAlign='center';ctxW.fillText('🧝',0,10);}
+    ctxW.shadowBlur=0;
+    ctxW.font='9px Cinzel,serif';ctxW.fillStyle=fp.col;ctxW.textAlign='center';
+    ctxW.fillText(fp.name,0,-40);
+    ctxW.restore();
+  }
+  // Enemy shadows
+  for(const en of enemies){
+    if(en.dead)continue;
+    ctxW.beginPath();ctxW.ellipse(en.px,en.py+T*.38,T*.34,T*.1,0,0,Math.PI*2);
+    ctxW.fillStyle='rgba(0,0,0,.32)';ctxW.fill();
+  }
+  // Enemies with SVG sprites
+  for(const en of enemies){
+    if(en.dead)continue;
+    const szM=en.boss?1.5:1;
+    const sw=T*szM*1.6, sh=T*szM*1.8;
+    ctxW.save();
+    ctxW.translate(en.px,en.py);
+    if(en.wobble>0)ctxW.rotate(Math.sin(en.wobble*22)*.16);
+    if(en.flash>0)ctxW.globalAlpha=.4+.6*Math.abs(Math.sin(en.flash*45));
+    ctxW.shadowBlur=en.boss?24:10;ctxW.shadowColor=en.col;
+    const img=SVG_CACHE[en.svgId];
+    if(img){ctxW.drawImage(img,-sw/2,-sh*.85,sw,sh);}
+    else{ctxW.font=(en.boss?'40px':'29px')+' serif';ctxW.textAlign='center';ctxW.fillText(en.e||'👾',0,en.boss?T*.32:T*.22);}
+    ctxW.restore();
+    // HP bar
+    const bw=T*(en.boss?2.2:1.3),bh=en.boss?7:5;
+    const bx=en.px-bw*.5,by=en.py-T*(en.boss?.95:.68);
+    ctxW.fillStyle='#111';ctxW.fillRect(bx,by,bw,bh);
+    const pct=Math.max(0,Math.min(1,en.hp/en.maxHp));
+    ctxW.fillStyle=pct>.5?'#44cc44':pct>.25?'#ccaa22':'#cc2222';
+    ctxW.fillRect(bx,by,bw*pct,bh);
+    if(en.boss){ctxW.font='10px Cinzel,serif';ctxW.fillStyle='#ff5555';ctxW.textAlign='center';ctxW.fillText('⚠ '+en.name,en.px,en.py-T*1.0);}
+    if(p.attackTarget===en){
+      ctxW.beginPath();ctxW.arc(en.px,en.py,T*.52+Math.sin(G.t*4)*2.5,0,Math.PI*2);
+      ctxW.strokeStyle='rgba(255,200,50,.55)';ctxW.lineWidth=2;ctxW.stroke();
+    }
+  }
+  // Player shadow
+  ctxW.beginPath();ctxW.ellipse(p.px,p.py+T*.4,T*.32,T*.1,0,0,Math.PI*2);
+  ctxW.fillStyle='rgba(0,0,0,.38)';ctxW.fill();
+  // Player glow
+  const gx=isFinite(p.px)?p.px:0,gy=isFinite(p.py)?p.py:0;
+  try{
+    const grd=ctxW.createRadialGradient(gx,gy,0,gx,gy,T);
+    grd.addColorStop(0,CLASSES[p.cls].col+'2a');grd.addColorStop(1,'transparent');
+    ctxW.fillStyle=grd;ctxW.beginPath();ctxW.arc(gx,gy,T,0,Math.PI*2);ctxW.fill();
+  }catch(e){}
+  // Pet
+  if(p.pet){
+    ctxW.save();ctxW.translate(p.px-52,p.py+10);
+    ctxW.shadowBlur=14;ctxW.shadowColor='#aa44ff';
+    ctxW.font='24px serif';ctxW.textAlign='center';ctxW.fillText(p.pet.emoji,0,0);
+    ctxW.font='8px Cinzel,serif';ctxW.fillStyle='#aa44ff';ctxW.fillText(p.pet.name,0,-13);
+    ctxW.restore();
+  }
+  // Mount
+  if(p.mount){
+    ctxW.save();ctxW.translate(p.px+52,p.py+10);
+    ctxW.shadowBlur=12;ctxW.shadowColor='#ffaa44';
+    ctxW.font='22px serif';ctxW.textAlign='center';ctxW.fillText(p.mount.emoji,0,0);
+    ctxW.restore();
+  }
+  // Player sprite SVG
+  ctxW.save();ctxW.translate(p.px,p.py);
+  ctxW.shadowBlur=24;ctxW.shadowColor=CLASSES[p.cls].col;
+  const pImg=SVG_CACHE[CLASSES[p.cls].svgId];
+  if(pImg){ctxW.drawImage(pImg,-24,-56,48,60);}
+  else{ctxW.font='33px serif';ctxW.textAlign='center';ctxW.fillText(CLASSES[p.cls].icon,0,T*.3);}
+  if(p.title){ctxW.font='8px Cinzel,serif';ctxW.fillStyle='rgba(240,208,80,.85)';ctxW.textAlign='center';ctxW.fillText('〔'+p.title+'〕',0,-T*.95);}
+  ctxW.font='bold 11px Cinzel,serif';ctxW.fillStyle=CLASSES[p.cls].col;ctxW.textAlign='center';
+  ctxW.fillText('Lv'+p.level,0,-T*.72);
+  ctxW.restore();
+  ctxW.restore();
+}
+
+// ══════════════════ WEATHER ══════════════════
+function drawWeather(dt){
+  if(!G||G.weather==='clear'){ctxWx.clearRect(0,0,cvWx.width,cvWx.height);wxParts=[];return;}
+  const need=G.weather==='storm'?300:G.weather==='rain'?170:65;
+  while(wxParts.length<need)wxParts.push({x:Math.random()*cvWx.width,y:Math.random()*cvWx.height,vy:G.weather==='fog'?.5:3.5+Math.random()*4,vx:G.weather==='storm'?-2.5-Math.random()*3:-.4,len:G.weather==='fog'?0:6+Math.random()*11,al:.14+Math.random()*.26});
+  ctxWx.clearRect(0,0,cvWx.width,cvWx.height);
+  if(G.weather==='fog'){ctxWx.fillStyle='rgba(88,98,108,.13)';ctxWx.fillRect(0,0,cvWx.width,cvWx.height);}
+  ctxWx.strokeStyle='rgba(155,190,255,.44)';ctxWx.lineWidth=.9;
+  for(const wp of wxParts){
+    wp.x+=wp.vx;wp.y+=wp.vy*60*dt;
+    if(wp.y>cvWx.height){wp.y=0;wp.x=Math.random()*cvWx.width;}
+    if(G.weather!=='fog'){ctxWx.globalAlpha=wp.al;ctxWx.beginPath();ctxWx.moveTo(wp.x,wp.y);ctxWx.lineTo(wp.x+wp.vx*1.4,wp.y-wp.len);ctxWx.stroke();}
+  }
+  ctxWx.globalAlpha=1;
+  if(G.weather==='storm'&&Math.random()<.004){ctxWx.fillStyle='rgba(255,255,255,.05)';ctxWx.fillRect(0,0,cvWx.width,cvWx.height);}
+}
+
+// ══════════════════ SKILLS ══════════════════
+function doSkill(idx,targets){
+  if(!G)return;
+  const sk=SKILLS[idx],p=G.p;
+  if(G.skillCD[idx]>0||p.mp<sk.cost){if(p.mp<sk.cost)log('MP insuficiente','sys');return;}
+  p.mp-=sk.cost;G.skillCD[idx]=sk.cd;startCdAnim(idx);
+  if(sk.type==='buff'){if(sk.buff==='shield')p.buffs.push({type:'shield',dur:12,maxDur:12,icon:'🛡️'});toast('✨ '+sk.name+' activado!');return;}
+  if(sk.type==='heal'){const h=(sk.heal[0]+Math.random()*(sk.heal[1]-sk.heal[0]))|0;p.hp=Math.min(p.maxHp,p.hp+h);spawnFD(p.px,p.py-T,'+'+h,'#44ee88');log(sk.name+' +'+h+' HP','heal');burst(p.px,p.py,sk.col,16);return;}
+  if(sk.type==='aoe'||sk.type==='dot'){
+    const r=T*(sk.type==='aoe'?3.5:2.2);
+    targets=G.enemies.filter(e=>!e.dead&&Math.hypot(e.px-p.px,e.py-p.py)<r);
+    if(!targets.length){if(p.attackTarget&&!p.attackTarget.dead)targets=[p.attackTarget];else{log('Sin objetivo','sys');return;}}
+  }else if(!targets||!targets.length){if(p.attackTarget&&!p.attackTarget.dead)targets=[p.attackTarget];else{log('Sin objetivo','sys');return;}}
+  for(const en of targets){
+    if(en.dead)continue;
+    let dmg=(sk.dmg[0]+Math.random()*(sk.dmg[1]-sk.dmg[0]))|0;
+    dmg+=p.level*3+Math.round(p.str*1.6);
+    const isCrit=Math.random()<p.critChance;
+    if(isCrit){dmg=Math.round(dmg*2.15);spawnFD(en.px,en.py-T*.7,'💥CRIT '+dmg,sk.col,true);screenShake(8);}
+    else spawnFD(en.px,en.py-T*.55,dmg,sk.col);
+    en.hp-=dmg;en.flash=.18;en.wobble=.24;p.totalDmg+=dmg;
+    if(sk.type==='dot'){en.dotTimer=4.5;en.dotDmg=Math.round(dmg*.14);}
+    if(p.pet&&!en.dead){const pd=Math.round(dmg*p.pet.dmgM);en.hp-=pd;p.totalDmg+=pd;spawnFD(en.px-28,en.py-T*.7,pd,'#aa44ff');}
+    G.combo++;G.comboTimer=3;
+    if(G.combo>p.maxCombo)p.maxCombo=G.combo;
+    updateComboUI();burst(en.px,en.py,sk.col,sk.type==='aoe'?18:9);
+    log(sk.name+' → '+en.name+' '+dmg+(isCrit?' 💥':''),'dmg');
+    if(en.hp<=0)killEnemy(en);
+  }
+}
+function useSkill(idx){if(!G||!G.running)return;doSkill(idx,G.p.attackTarget?[G.p.attackTarget]:[]);}
+
+// ══════════════════ KILL & LOOT ══════════════════
+function killEnemy(en){
+  if(en.dead)return;en.dead=true;
+  const p=G.p;
+  p.kills++;if(en.boss){p.bossKills++;screenShake(14);}
+  p.xp+=en.xp;p.gold+=(en.gold[0]+Math.random()*(en.gold[1]-en.gold[0]))|0;G.score+=en.xp;
+  burst(en.px,en.py,en.col,en.boss?40:18);
+  log(en.name+' derrotado! +'+en.xp+'XP','xp');
+  if(en.boss)toast('🏆 JEFE DERROTADO — '+en.name+'!',5000);
+  dropLoot(en);checkQuest('kill',en.name,en.boss);checkLevelUp();checkAchievements();
+  if(p.kills>=60)gameWin();
+}
+
+function dropLoot(en){
+  if(Math.random()>en.drop)return;
+  const roll=Math.random();
+  const rar=en.boss?(roll>.5?'epic':roll>.15?'rare':'legend'):(roll>.94?'legend':roll>.75?'epic':roll>.45?'rare':'common');
+  const pool=SHOP_ITEMS.filter(i=>i.rarity===rar);if(!pool.length)return;
+  const item={...pool[Math.floor(Math.random()*pool.length)],id:Date.now()};
+  G.p.inventory.push(item);
+  const el=document.createElement('div');el.className='lootfx';
+  el.style.left=(en.px-G.camX-14)+'px';el.style.top=(en.py-G.camY-40)+'px';
+  el.style.color=rar==='legend'?'#f0d070':rar==='epic'?'#cc44ff':rar==='rare'?'#6688ff':'#aaa';
+  el.textContent=item.icon+(rar==='legend'?'★':rar==='epic'?'◆':'');
+  document.body.appendChild(el);setTimeout(()=>el.remove(),2400);
+  if(rar==='legend'||rar==='epic')toast('💎 DROP '+rar.toUpperCase()+' → '+item.name+'!',4000);
+  log('💰 Loot: '+item.name+' ['+rar+']','loot');
+}
+
+// ══════════════════ LEVEL UP ══════════════════
+function checkLevelUp(){
+  const p=G.p;
+  while(p.xp>=p.xpNext){
+    p.xp-=p.xpNext;p.level++;
+    p.xpNext=Math.floor(150*Math.pow(1.43,p.level-1));
+    p.maxHp+=30+p.vit*2;p.hp=p.maxHp;p.maxMp+=18+p.int;p.mp=p.maxMp;
+    p.def+=2;p.statPts+=3;p.speed+=1.5;
+    log('🎉 ¡NIVEL '+p.level+'! +3 puntos libres','sys');
+    toast('⭐ ¡Nivel '+p.level+' alcanzado!');
+    const f=document.getElementById('lvfl');f.style.display='block';
+    setTimeout(()=>{f.style.display='none';},1700);screenShake(6);
+  }
+}
+
+// ══════════════════ QUESTS ══════════════════
+function checkQuest(type,val,isBoss){
+  if(!G)return;
+  G.quests.forEach(q=>{
+    if(q.done)return;
+    if(type==='kill'&&q.type==='kill'&&q.target===val){q.progress++;if(q.progress>=q.goal)completeQ(q);}
+    if(type==='kill'&&q.type==='boss'&&isBoss&&q.target===val){q.progress++;if(q.progress>=q.goal)completeQ(q);}
+    if(type==='map'&&q.type==='map'){q.progress=G.visitedMaps.size;if(q.progress>=q.goal)completeQ(q);}
+    if(type==='gold'&&q.type==='gold'){q.progress=G.p.gold;if(q.progress>=q.goal)completeQ(q);}
+    if(type==='combo'&&q.type==='combo'){q.progress=Math.max(q.progress,G.combo);if(q.progress>=q.goal)completeQ(q);}
+    if(type==='level'&&q.type==='level'){q.progress=G.p.level;if(q.progress>=q.goal)completeQ(q);}
+  });
+}
+function completeQ(q){q.done=true;G.p.xp+=q.reward.xp||0;G.p.gold+=q.reward.gold||0;toast('✅ Quest: '+q.title+' — +'+(q.reward.xp||0)+'XP +'+(q.reward.gold||0)+'G',4000);checkLevelUp();}
+
+// ══════════════════ ACHIEVEMENTS ══════════════════
+function checkAchievements(){
+  if(!G)return;const p=G.p;
+  ACHIEVEMENTS_DB.forEach((a,i)=>{
+    if(p.achievements[i])return;
+    if(a.cond(p)){p.achievements[i]=true;if(a.title&&!p.title)p.title=a.title;toast('🏆 '+a.icon+' Logro: '+a.name+' — Título: 〔'+a.title+'〕',5000);screenShake(4);}
+  });
+}
+
+// ══════════════════ PET & MOUNT ══════════════════
+function togglePet(){
+  if(!G)return;
+  if(G.p.pet){G.p.pet=null;document.getElementById('pethud').classList.remove('on');toast('🐾 Mascota guardada');}
+  else{G.p.pet={name:'Lobo Fantasma',emoji:'🐺',dmgM:.45};document.getElementById('pethud').textContent='🐾 Lobo Fantasma activo (+45%)';document.getElementById('pethud').classList.add('on');toast('🐾 ¡Lobo Fantasma invocado! +45% daño extra',3000);burst(G.p.px,G.p.py,'#aa44ff',20);}
+}
+function toggleMount(){
+  if(!G)return;
+  if(G.p.mount){G.p.mount=null;G.p.speed=260;toast('🐎 Montura guardada');}
+  else{G.p.mount={name:'Corcel Celestial',emoji:'🐎',spdM:1.65};G.p.speed=260;toast('🐎 ¡Corcel Celestial! +65% velocidad',3000);burst(G.p.px,G.p.py,'#ffaa44',18);}
+}
+
+// ══════════════════ INPUT ══════════════════
+cvW.addEventListener('click',e=>{
+  if(!G||!G.running)return;
+  const wx=e.clientX+G.camX,wy=e.clientY+G.camY;
+  for(const en of G.enemies){if(!en.dead&&Math.hypot(en.px-wx,en.py-wy)<T*.78){G.p.attackTarget=en;G.p.moveTarget=null;return;}}
+  const tx=Math.floor(wx/T),ty=Math.floor(wy/T);
+  const tiles=G.allTiles[G.mapKey],m=MAPS[G.mapKey];
+  if(tx>=0&&tx<m.w&&ty>=0&&ty<m.h&&tiles[ty]&&tiles[ty][tx]===0){G.p.moveTarget={px:tx*T+T*.5,py:ty*T+T*.5};G.p.attackTarget=null;}
+});
+document.addEventListener('keydown',e=>{
+  if(!G||!G.running)return;
+  const km={'1':0,'2':1,'3':2,'4':3,'5':4,'6':5,'7':6,'8':7,'9':8,'0':9};
+  if(km[e.key]!==undefined){useSkill(km[e.key]);return;}
+  if(e.key==='Escape'){closeAllM();return;}
+  if(e.key==='i'||e.key==='I'){openM('inventory');return;}
+  if(e.key==='q'||e.key==='Q'){openM('quests');return;}
+  if(e.key==='t'||e.key==='T'){openM('teleport');return;}
+  if(e.key==='p'||e.key==='P'){togglePet();return;}
+  if(e.key==='m'||e.key==='M'){toggleMount();return;}
+  if(e.key==='c'||e.key==='C'){toggleChat();return;}
+  const spd=T;
+  if(e.key==='w'||e.key==='ArrowUp')   G.p.moveTarget={px:G.p.px,       py:G.p.py-spd};
+  if(e.key==='s'||e.key==='ArrowDown') G.p.moveTarget={px:G.p.px,       py:G.p.py+spd};
+  if(e.key==='a'||e.key==='ArrowLeft') G.p.moveTarget={px:G.p.px-spd,   py:G.p.py};
+  if(e.key==='d'||e.key==='ArrowRight')G.p.moveTarget={px:G.p.px+spd,   py:G.p.py};
+});
+
+// ══════════════════ HUD ══════════════════
+function updateHUD(){
+  if(!G||!G.p)return;
+  const p=G.p;
+  document.getElementById('b-hp').style.width=(p.hp/p.maxHp*100)+'%';
+  document.getElementById('b-mp').style.width=(p.mp/p.maxMp*100)+'%';
+  document.getElementById('b-xp').style.width=(p.xp/p.xpNext*100)+'%';
+  document.getElementById('v-hp').textContent=Math.ceil(p.hp)+'/'+p.maxHp;
+  document.getElementById('v-mp').textContent=Math.ceil(p.mp)+'/'+p.maxMp;
+  document.getElementById('v-xp').textContent=p.xp+'/'+p.xpNext;
+  document.getElementById('nlv').innerHTML=p.name+' · Nv'+p.level+'<small>'+CLASSES[p.cls].name+'</small>';
+  document.getElementById('ghud').textContent='💰 '+p.gold;
+  const br=document.getElementById('bufs');
+  br.innerHTML=p.buffs.map(b=>'<div class="bufic" title="'+b.type+'">'+b.icon+'<div class="buft" style="width:'+(b.dur/b.maxDur*100)+'%"></div></div>').join('');
+}
+
+function buildHotbar(){
+  document.getElementById('hotbar').innerHTML=SKILLS.map((sk,i)=>
+    '<div class="skb" id="sk'+i+'" onclick="useSkill('+i+')" title="'+sk.name+'">'
+    +'<span class="ski">'+sk.icon+'</span>'
+    +(sk.cost?'<span class="skc">'+sk.cost+'</span>':'')
+    +'<span class="skk">'+(i<9?i+1:0)+'</span>'
+    +'<div class="cdov"></div>'
+    +'</div>').join('');
+}
+
+function startCdAnim(idx){
+  const btn=document.getElementById('sk'+idx);if(!btn)return;
+  btn.classList.add('cd');const ov=btn.querySelector('.cdov');
+  let rem=SKILLS[idx].cd;clearInterval(cdTimers[idx]);
+  cdTimers[idx]=setInterval(()=>{rem-=.1;if(ov)ov.textContent=rem>0?rem.toFixed(1):'';if(rem<=0){btn.classList.remove('cd');if(ov)ov.textContent='';clearInterval(cdTimers[idx]);}},100);
+}
+
+function updateComboUI(){
+  const cd=document.getElementById('combo');
+  if(!G||G.combo<3){cd.classList.remove('on');return;}
+  cd.classList.add('on');const n=document.getElementById('cbn');
+  n.textContent=G.combo+'x';n.style.animationName='none';
+  requestAnimationFrame(()=>{n.style.animationName='';});
+}
+
+function drawMinimap(){
+  if(!G)return;
+  const mc=document.getElementById('mmc'),ctx=mc.getContext('2d');
+  const m=MAPS[G.mapKey],tiles=G.allTiles[G.mapKey];
+  const tw=mc.width/m.w,th=mc.height/m.h;
+  ctx.clearRect(0,0,mc.width,mc.height);
+  for(let y=0;y<m.h;y++)for(let x=0;x<m.w;x++){
+    ctx.fillStyle=(tiles[y]&&tiles[y][x]===0)?m.floor:'#080808';
+    ctx.fillRect(x*tw,y*th,tw+.5,th+.5);
+  }
+  G.enemies.forEach(en=>{if(en.dead)return;ctx.fillStyle=en.boss?'#ff4422':en.col;ctx.fillRect(en.px/T*tw-1.5,en.py/T*th-1.5,3,3);});
+  G.fakePlayers.forEach(fp=>{if(fp.map!==G.mapKey)return;ctx.fillStyle=fp.col;ctx.fillRect(fp.px/T*tw-2,fp.py/T*th-2,4,4);});
+  const p=G.p;ctx.fillStyle=CLASSES[p.cls].col;
+  ctx.beginPath();ctx.arc(p.px/T*tw,p.py/T*th,4.5,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#fff';ctx.lineWidth=1;ctx.stroke();
+}
+
+// ══════════════════ FLOAT DMG & BURST ══════════════════
+function spawnFD(x,y,text,color,crit){
+  if(!G)return;
+  const el=document.createElement('div');el.className='fdmg'+(crit?' crit':'');
+  el.style.left=(x-G.camX-18)+'px';el.style.top=(y-G.camY)+'px';
+  el.style.color=color;el.style.fontSize=crit?'1.35rem':'.9rem';el.textContent=text;
+  document.body.appendChild(el);setTimeout(()=>el.remove(),1200);
+}
+
+function burst(x,y,color,count){
+  if(!G)return;
+  ctxFx.save();
+  for(let i=0;i<count;i++){
+    const a=Math.random()*Math.PI*2,d=14+Math.random()*42;
+    ctxFx.fillStyle=color+'99';ctxFx.beginPath();
+    ctxFx.arc(x-G.camX+Math.cos(a)*d*.3,y-G.camY+Math.sin(a)*d*.3,2+Math.random()*3.5,0,Math.PI*2);
+    ctxFx.fill();
+  }
+  ctxFx.restore();
+  setTimeout(()=>ctxFx.clearRect(0,0,cvFx.width,cvFx.height),220);
+}
+
+// ══════════════════ COMBAT LOG ══════════════════
+function log(msg,type){
+  const el=document.createElement('div');el.className='cl '+(type||'sys');el.textContent=msg;
+  const clog=document.getElementById('clog');clog.prepend(el);logLines.push(el);
+  if(logLines.length>8){logLines[0].remove();logLines.shift();}
+}
+
+// ══════════════════ TOAST ══════════════════
+function toast(msg,dur){
+  const tc=document.getElementById('toasts');const el=document.createElement('div');
+  el.className='toast';el.textContent=msg;tc.appendChild(el);
+  setTimeout(()=>{el.style.opacity='0';el.style.transition='opacity .3s';setTimeout(()=>el.remove(),310);},dur||2800);
+}
+
+// ══════════════════ BOSS WARNING ══════════════════
+function showBossWarn(name){
+  const bw=document.getElementById('bwarn');
+  document.getElementById('bwt').textContent='⚠ '+name.toUpperCase()+' ⚠';
+  bw.classList.add('on');setTimeout(()=>bw.classList.remove('on'),3200);
+}
+
+// ══════════════════ TELEPORT UI (Mundo Inmersivo) ══════════════════
+function buildTeleportUI(){
+  const tp=document.getElementById('tp-c');
+  if(!tp)return;
+
+  tp.innerHTML = Object.entries(MAPS).map(([k,m])=>{
+    const art = WORLD_ART[k]||WORLD_ART.bosque_oscuro;
+    const svgArt = mkWorldSVG(k, 380, 190);
+    const svgUrl = 'data:image/svg+xml,'+encodeURIComponent(svgArt);
+    const isActive = G && G.mapKey===k;
+    const isVisited = G && G.visitedMaps && G.visitedMaps.has(k);
+    const dangerColor = m.safe ? '#44ffaa' : m.danger>=4 ? '#ff4444' : m.danger>=2 ? '#ffaa44' : '#ffdd66';
+    const dangerStars = m.safe ? '' : '⚔'.repeat(m.danger);
+
+    return `<div class="portal-card${isActive?' active-map':''}" onclick="changeMap('${k}')">
+      <img class="portal-bg" src="${svgUrl}" alt="${m.name}"/>
+      <div class="portal-overlay"></div>
+      <div class="portal-shimmer"></div>
+      <div class="portal-info">
+        <div class="portal-name">${m.name}</div>
+        <div class="portal-danger">
+          <span class="portal-badge ${m.safe?'pbadge-safe':'pbadge-danger'}">
+            ${m.safe ? '⛪ Zona Segura' : dangerStars+' Peligro ×'+m.danger}
+          </span>
+          ${isActive ? '<span style="color:var(--gold);font-size:.6rem;margin-left:4px">◀ Ubicación Actual</span>' : ''}
+        </div>
+        <button class="portal-enter-btn">${isActive ? '★ Aquí Estás' : '⟶ Entrar al Portal'}</button>
+      </div>
+      ${isVisited?'<div class="portal-visited">✓ Visitado</div>':''}
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════ MODALS ══════════════════
+function openM(name){
+  document.getElementById('m-'+name).classList.add('on');
+  if(name==='inventory')    renderInv();
+  if(name==='quests')       renderQuests();
+  if(name==='shop')         renderShop();
+  if(name==='forge')        renderForge();
+  if(name==='stats')        renderStats();
+  if(name==='talent')       renderTalents();
+  if(name==='achievements') renderAch();
+  if(name==='guild')        renderGuild();
+  if(name==='ranking')      renderRanking();
+  if(name==='teleport')     buildTeleportUI();
+  if(name==='daily')        renderDaily();
+}
+function closeM(name){document.getElementById('m-'+name).classList.remove('on');}
+function closeAllM(){document.querySelectorAll('.modal').forEach(m=>m.classList.remove('on'));}
+
+// Inventory
+function renderInv(){
+  if(!G)return;const p=G.p;
+  let h='<div style="display:flex;gap:13px;flex-wrap:wrap;">';
+  h+='<div style="min-width:185px"><div style="font-family:Cinzel,serif;color:var(--gold);margin-bottom:6px">Equipado</div><div style="display:flex;gap:6px;flex-wrap:wrap">';
+  ['weapon','armor','accessory'].forEach(sl=>{
+    const it=p.equipped[sl];
+    h+='<div class="isl '+(it?'eq':'emp')+'" onclick="unequip(\''+sl+'\')">';
+    if(it)h+='<span style="font-size:1.6rem">'+it.icon+'</span><span style="font-size:.58rem">'+it.name+'</span>';
+    else h+='<span style="font-size:.6rem;color:var(--dim)">'+sl+'</span>';
+    h+='</div>';
+  });
+  h+='</div></div>';
+  h+='<div style="flex:2;min-width:225px"><div style="font-family:Cinzel,serif;color:var(--gold);margin-bottom:6px">Bolsa ('+p.inventory.length+')</div><div class="igrid">';
+  p.inventory.forEach((item,i)=>{
+    const r=item.rarity||'common';
+    const stat=item.atk?'+'+item.atk+' ATK':item.def?'+'+item.def+' DEF':item.heal?'+'+item.heal+' HP':item.crit?(item.crit*100).toFixed(0)+'% CRT':'';
+    h+='<div class="isl" onclick="useOrEquip('+i+')">'
+      +'<span style="font-size:1.7rem">'+item.icon+'</span>'
+      +'<span style="font-size:.58rem">'+item.name+(item.count&&item.count>1?' x'+item.count:'')+'</span>'
+      +'<span style="color:var(--gold);font-size:.56rem">'+stat+'</span>'
+      +'<span class="tag '+r+'">'+r+'</span>'
+      +'</div>';
+  });
+  h+='</div></div></div>';
+  document.getElementById('inv-c').innerHTML=h;
+}
+function useOrEquip(i){
+  if(!G)return;const item=G.p.inventory[i];if(!item)return;
+  if(item.type==='consumable'){
+    if(item.heal){G.p.hp=Math.min(G.p.maxHp,G.p.hp+item.heal);log('🧪 +'+item.heal+' HP','heal');}
+    if(item.mp){G.p.mp=Math.min(G.p.maxMp,G.p.mp+item.mp);log('💧 +'+item.mp+' MP','heal');}
+    if(item.xpGain){G.p.xp+=item.xpGain;checkLevelUp();log('✨ +'+item.xpGain+' XP','xp');}
+    item.count=(item.count||1)-1;if(item.count<=0)G.p.inventory.splice(i,1);
+  }else{
+    const sl=item.type==='helm'?'armor':item.type;
+    if(['weapon','armor','accessory'].includes(sl)){
+      if(G.p.equipped[sl])G.p.inventory.push(G.p.equipped[sl]);
+      G.p.equipped[sl]=item;G.p.inventory.splice(i,1);toast('⚔️ '+item.name+' equipado!');
+      if(item.crit)G.p.critChance=Math.min(.5,G.p.critChance+item.crit);
+      if(item.spdBonus)G.p.speed+=item.spdBonus;
+    }
+  }
+  updateHUD();renderInv();
+}
+function unequip(sl){if(!G||!G.p.equipped[sl])return;G.p.inventory.push(G.p.equipped[sl]);G.p.equipped[sl]=null;renderInv();}
+
+// Quests
+function renderQuests(){
+  if(!G)return;
+  document.getElementById('quest-c').innerHTML=G.quests.map(q=>{
+    const rew=(q.reward.xp?q.reward.xp+' XP':'')+' '+(q.reward.gold?q.reward.gold+' G':'');
+    return '<div class="qi '+(q.done?'done':'')+'">'
+      +'<div class="qt">'+(q.done?'✅ ':'')+q.title+'</div>'
+      +'<div class="qd">'+q.desc+'</div>'
+      +(rew.trim()?'<div style="font-size:.68rem;color:var(--gold);margin-top:3px">Recompensa: '+rew.trim()+'</div>':'')
+      +'<div class="qpw"><div class="qpb" style="width:'+Math.min(100,q.progress/q.goal*100)+'%"></div></div>'
+      +'<div style="font-size:.62rem;color:var(--muted);margin-top:2px">'+q.progress+'/'+q.goal+'</div>'
+      +'</div>';
+  }).join('');
+}
+
+// Shop
+function renderShop(){
+  if(!G)return;
+  let h='<div style="font-family:Cinzel,serif;color:var(--gold);margin-bottom:10px">💰 Oro: '+G.p.gold+'</div><div class="sgrid">';
+  SHOP_ITEMS.forEach((it,i)=>{
+    const stat=it.atk?'+'+it.atk+' ATK':it.def?'+'+it.def+' DEF':it.heal?'+'+it.heal+' HP':it.crit?(it.crit*100)+'% CRT':it.xpGain?'+'+it.xpGain+' XP':'';
+    h+='<div class="si" onclick="buyItem('+i+')">'
+      +'<div style="font-size:2rem">'+it.icon+'</div>'
+      +'<div style="font-family:Cinzel,serif;font-size:.75rem;color:var(--text)">'+it.name+'</div>'
+      +'<div style="font-size:.6rem;color:var(--muted);margin:3px 0">'+stat+'</div>'
+      +'<div style="display:flex;align-items:center;justify-content:center;gap:5px">'
+      +'<span class="tag '+it.rarity+'">'+it.rarity+'</span>'
+      +'<span style="color:var(--gold);font-size:.7rem">💰'+it.price+'</span>'
+      +'</div></div>';
+  });
+  h+='</div>';document.getElementById('shop-c').innerHTML=h;
+}
+function buyItem(i){
+  if(!G)return;const it=SHOP_ITEMS[i];
+  if(G.p.gold<it.price){toast('💰 Oro insuficiente');return;}
+  G.p.gold-=it.price;const item={...it,id:Date.now()};
+  if(item.type==='consumable')item.count=1;
+  G.p.inventory.push(item);toast('✅ '+it.name+' comprado!');renderShop();updateHUD();
+}
+
+// Forge
+function renderForge(){
+  let h='<div style="text-align:center;color:var(--muted);font-size:.8rem;margin-bottom:13px">Combina items para crear equipo legendario</div><div style="display:flex;flex-direction:column;gap:16px">';
+  FORGE_RECIPES.forEach((rec,ri)=>{
+    h+='<div style="background:var(--stone);border:var(--ui-b);border-radius:6px;padding:14px;text-align:center">'
+      +'<div style="font-family:Cinzel,serif;color:var(--gold);margin-bottom:10px">'+rec.name+'</div>'
+      +'<div style="display:flex;align-items:center;justify-content:center;gap:9px">';
+    rec.mats.forEach((idx,mi)=>{
+      if(mi>0)h+='<span style="color:var(--gold);font-size:1.2rem">+</span>';
+      h+='<div class="fslot fill"><span style="font-size:1.6rem">'+SHOP_ITEMS[idx].icon+'</span></div>';
+    });
+    h+='<span style="color:var(--muted);font-size:1.2rem">→</span>'
+      +'<div style="width:90px;height:90px;background:var(--stone2);border:2px solid var(--gold);border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;box-shadow:0 0 14px rgba(201,168,76,.4)">'
+      +'<span style="font-size:2.2rem">'+rec.result.icon+'</span>'
+      +'<span style="font-size:.6rem;font-family:Cinzel,serif;color:var(--gold)">'+rec.result.name+'</span>'
+      +'</div></div>'
+      +'<button onclick="forgeItem('+ri+')" class="btn" style="margin-top:10px;font-size:.76rem;padding:.45em 1.4em;max-width:150px">⚒️ Forjar</button>'
+      +'</div>';
+  });
+  h+='</div>';document.getElementById('forge-c').innerHTML=h;
+}
+function forgeItem(ri){if(!G)return;G.p.inventory.push({...FORGE_RECIPES[ri].result,id:Date.now()});toast('⚒️ '+FORGE_RECIPES[ri].result.name+' forjada!');renderForge();}
+
+// Stats
+function renderStats(){
+  if(!G)return;const p=G.p;
+  const mkStat=(label,val,stat)=>{
+    let h='<div class="stb"><div class="stl">'+label+'</div><div style="display:flex;align-items:center;gap:7px"><div class="stv">'+val+'</div>';
+    if(stat&&p.statPts>0)h+='<button class="stbtn" onclick="allocate(\''+stat+'\')">+</button>';
+    h+='</div></div>';return h;
+  };
+
+  // Character portrait
+  const c=CLASSES[p.cls];
+  const portSvg=`<svg width="90" height="105" viewBox="0 0 72 80"><use href="#${c.svgId}"/></svg>`;
+
+  document.getElementById('stats-c').innerHTML=
+    '<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px;align-items:flex-start">'
+    +'<div style="background:var(--stone);border:2px solid var(--gold3);border-radius:8px;padding:8px;text-align:center;min-width:105px">'
+    +portSvg
+    +'<div style="font-family:Cinzel,serif;font-size:.82rem;color:var(--gold);margin-top:4px">'+p.name+'</div>'
+    +'<div style="font-size:.65rem;color:var(--muted)">'+c.name+' · Nv'+p.level+'</div>'
+    +'<div style="font-size:.65rem;color:var(--gold);margin-top:3px">〔'+(p.title||'Sin título')+'〕</div>'
+    +'</div>'
+    +'<div class="stg" style="flex:1">'
+    +mkStat('Nivel',p.level)+mkStat('Oro','💰'+p.gold)
+    +mkStat('Bajas',p.kills)+mkStat('Daño',p.totalDmg)
+    +mkStat('Combo Máx',p.maxCombo+'x')+mkStat('Mapas',G.visitedMaps.size)
+    +mkStat('Fuerza',p.str,'str')+mkStat('Agilidad',p.agi,'agi')
+    +mkStat('Inteligencia',p.int,'int')+mkStat('Vitalidad',p.vit,'vit')
+    +'</div></div>'
+    +'<div style="margin-top:4px;font-family:Cinzel,serif;color:var(--gold)">Puntos libres: '+p.statPts+'</div>'
+    +'<div style="height:1px;background:rgba(201,168,76,.18);margin:9px 0"></div>'
+    +'<button onclick="changeName()" class="btn" style="font-size:.76rem;padding:.45em 1.3em;max-width:190px">✏️ Cambiar Nombre</button>';
+}
+function allocate(stat){
+  if(!G||G.p.statPts<=0)return;G.p.statPts--;const p=G.p;
+  if(stat==='str'){p.str+=3;p.atkBase[1]+=6;}
+  if(stat==='agi'){p.agi+=3;p.critChance=Math.min(.45,p.critChance+.02);p.speed+=5;}
+  if(stat==='int'){p.int+=3;p.maxMp+=22;p.mp=p.maxMp;}
+  if(stat==='vit'){p.vit+=3;p.maxHp+=42;p.hp=p.maxHp;}
+  renderStats();updateHUD();
+}
+function changeName(){const n=prompt('Nuevo nombre:',G.p.name);if(n&&n.trim().length>1){G.p.name=n.trim();localStorage.setItem('iaqName',G.p.name);toast('Nombre cambiado a '+G.p.name);closeM('stats');}}
+
+// Talents
+function renderTalents(){
+  if(!G)return;
+  const icons=['🔥','⚡','❄️','☄️','💖','🛡️','🌑','👊','🏹','✨','🌋','💎'];
+  const names=['Ardor','Relámpago','Escarcha','Caos','Sanación','Fortaleza','Sombra','Brutalidad','Precisión','Gracia','Apocalipsis','Maestría'];
+  let h='<div style="font-family:Cinzel,serif;color:var(--gold);text-align:center;margin-bottom:10px">Puntos libres: '+G.p.statPts+'</div><div class="tgrid">';
+  icons.forEach((ic,i)=>{
+    h+='<div><div class="tnode '+(G.p.talents[i]>0?'unl':'')+'" onclick="unlockTalent('+i+')" title="'+names[i]+'">'+ic+'</div>'
+      +'<div style="font-size:.58rem;text-align:center;color:var(--muted);margin-top:3px">'+names[i]+'</div>'
+      +(G.p.talents[i]>0?'<div style="font-size:.56rem;text-align:center;color:var(--gold)">Nv'+G.p.talents[i]+'</div>':'')
+      +'</div>';
+  });
+  h+='</div>';document.getElementById('talent-c').innerHTML=h;
+}
+function unlockTalent(i){if(!G||G.p.statPts<=0){toast('Sin puntos disponibles');return;}G.p.statPts--;G.p.talents[i]++;toast('🌟 Talento desbloqueado!');renderTalents();}
+
+// Achievements with character portraits
+function renderAch(){
+  if(!G)return;
+  document.getElementById('ach-c').innerHTML=ACHIEVEMENTS_DB.map((a,i)=>
+    '<div class="achi '+(G.p.achievements[i]?'done':'')+'">'
+    +'<span style="font-size:1.8rem;flex-shrink:0">'+a.icon+'</span>'
+    +'<div><div style="font-family:Cinzel,serif;font-size:.84rem;color:var(--gold)">'+a.name+'</div>'
+    +'<div style="font-size:.7rem;color:var(--muted)">'+a.desc+'</div>'
+    +(G.p.achievements[i]?'<div style="font-size:.65rem;color:var(--gold);margin-top:2px">✓ Título: 〔'+a.title+'〕</div>':'')
+    +'</div></div>').join('');
+}
+
+// Guild
+function renderGuild(){
+  if(!G)return;
+  const c=CLASSES[G.p.cls];
+  let h='<div style="margin-bottom:9px"><div style="font-family:Cinzel,serif;color:var(--gold);margin-bottom:5px">Nombre del Guild:</div>'
+    +'<input class="ginp" id="ginp" value="'+(G.p.guild||'Los Legendarios')+'">'
+    +'<button onclick="saveGuild()" class="btn" style="margin-top:7px;font-size:.76rem;padding:.45em 1.3em;max-width:160px">💾 Guardar</button>'
+    +'</div><div style="height:1px;background:rgba(201,168,76,.18);margin:9px 0"></div>'
+    +'<div style="font-family:Cinzel,serif;color:var(--gold);margin-bottom:7px">Miembros Online</div>'
+    +'<div class="gmb">'
+    +'<div style="width:32px;height:32px;flex-shrink:0"><svg width="32" height="36" viewBox="0 0 72 80"><use href="#'+c.svgId+'"/></svg></div>'
+    +'<span style="font-family:Cinzel,serif">'+G.p.name+'</span>'
+    +'<span style="margin-left:auto;color:var(--gold);font-size:.72rem">Lv'+G.p.level+' — Tú</span></div>';
+  FAKE_PLAYERS.forEach(fp=>{
+    h+='<div class="gmb"><div style="width:32px;height:32px;flex-shrink:0"><svg width="32" height="36" viewBox="0 0 72 80"><use href="#'+fp.svgId+'"/></svg></div>'
+      +'<span style="font-family:Cinzel,serif;color:'+fp.col+'">'+fp.name+'</span>'
+      +'<span style="margin-left:auto;color:var(--muted);font-size:.72rem">Lv'+fp.level+'</span></div>';
+  });
+  document.getElementById('guild-c').innerHTML=h;
+}
+function saveGuild(){const v=document.getElementById('ginp');if(v&&v.value.trim()&&G)G.p.guild=v.value.trim();toast('🛡️ Guild actualizada');closeM('guild');}
+
+// Ranking
+function renderRanking(){
+  if(!G)return;
+  const medals=['🥇','🥈','🥉','4','5','6'];
+  const myRow={name:G.p.name,lv:G.p.level,score:G.score||0,cls:CLASSES[G.p.cls].name,isMe:true};
+  const rows=[...RANK_FAKE,myRow].sort((a,b)=>b.score-a.score);
+  document.getElementById('rank-c').innerHTML=rows.map((r,i)=>
+    '<div class="rkr" style="'+(r.isMe?'border-color:var(--gold)':'')+'">'
+    +'<span class="rkp">'+(medals[i]||i+1)+'</span>'
+    +'<span style="font-family:Cinzel,serif;font-size:.83rem;flex:1;color:'+(r.isMe?'var(--gold)':'var(--text)')+'">'
+    +r.name+(r.isMe?' ◀ tú':'')+'</span>'
+    +'<span style="color:var(--muted);font-size:.7rem">'+r.cls+'</span>'
+    +'<span style="color:var(--muted);font-size:.7rem;margin-left:6px">Lv'+r.lv+'</span>'
+    +'<span style="color:var(--gold);font-size:.8rem;margin-left:8px">'+r.score+'</span></div>'
+  ).join('');
+}
+
+// Daily
+function showDailyModal(){if(!G)return;openM('daily');}
+function renderDaily(){
+  const today=new Date().toDateString();
+  const saved=JSON.parse(localStorage.getItem('iaqDaily')||'{}');
+  const claimed=saved.date===today;const day=saved.streak||1;
+  let h='<div style="text-align:center;color:var(--muted);font-size:.8rem;margin-bottom:11px">'
+    +(claimed?'✓ Ya reclamaste hoy. Vuelve mañana.':'¡Reclama tu recompensa de hoy!')
+    +'</div><div class="dgrid">';
+  DAILY_REWARDS.forEach((r,i)=>{
+    const isClaimed=i+1<day,isToday=i+1===day&&!claimed;
+    const cls='dbox'+(isClaimed?' claimed':'')+(isToday?' today':'');
+    const onclick=isToday?' onclick="claimDaily('+i+')"':'';
+    h+='<div class="'+cls+'"'+onclick+'>'
+      +'<span style="font-size:1.4rem">'+r.icon+'</span>'
+      +'<span style="color:var(--gold);font-size:.56rem">Día '+r.day+'</span>'
+      +'<span style="color:var(--muted);font-size:.53rem">'+r.label+'</span>'
+      +'</div>';
+  });
+  h+='</div><div style="text-align:center;font-size:.72rem;color:var(--muted)">Racha: '+day+' día(s)</div>';
+  document.getElementById('daily-c').innerHTML=h;
+}
+function claimDaily(idx){
+  if(!G)return;const today=new Date().toDateString();
+  const saved=JSON.parse(localStorage.getItem('iaqDaily')||'{}');
+  if(saved.date===today){toast('Ya reclamaste hoy');return;}
+  const streak=Math.min(7,(saved.streak||0)+1);const nextStreak=streak>=7?1:streak+1;
+  localStorage.setItem('iaqDaily',JSON.stringify({date:today,streak:nextStreak}));
+  const r=DAILY_REWARDS[idx];
+  if(r.type==='gold'){G.p.gold+=r.amount;toast('🎁 +'+r.amount+' Oro!');}
+  if(r.type==='xp'){G.p.xp+=r.amount;checkLevelUp();toast('🎁 +'+r.amount+' XP!');}
+  if(r.type==='item'){G.p.inventory.push({...r.item,id:Date.now()});toast('🎁 '+r.item.name+' añadido!');}
+  updateHUD();renderDaily();
+}
+
+// ══════════════════ CHAT ══════════════════
+function toggleChat(){document.getElementById('chat').classList.toggle('on');}
+function sendChat(){
+  const inp=document.getElementById('chat-in');if(!inp.value.trim())return;
+  addChat(G?G.p.name:'Angelo',inp.value,G?CLASSES[G.p.cls].col:'#c9a84c');inp.value='';
+}
+function addChat(name,msg,col){
+  const cm=document.getElementById('chat-msgs');const el=document.createElement('div');
+  el.innerHTML='<span style="color:'+col+';font-family:Cinzel,serif;font-size:.7rem">'+name+':</span> '+msg;
+  cm.appendChild(el);cm.scrollTop=cm.scrollHeight;
+}
+function startFakeChat(){
+  const msgs=['¡Boss en el dungeon!','Alguien quiere trade?','Drop legendario! 🌟','iAngelo Quest es épico 🔥','¡Combo x12!','Subí al nivel 8 🎉','La forja es OP','Lobo Fantasma vale','¿Alguien en Volcán?'];
+  setInterval(()=>{
+    if(!G||!G.running)return;
+    const fp=G.fakePlayers[Math.floor(Math.random()*G.fakePlayers.length)];
+    addChat(fp.name,msgs[Math.floor(Math.random()*msgs.length)],fp.col);
+  },5500);
+}
+
+// ══════════════════ SAVE ══════════════════
+function saveGame(){if(!G||!G.p)return;localStorage.setItem('iaqSave',JSON.stringify({p:G.p,quests:G.quests,mapKey:G.mapKey,score:G.score||0}));}
+
+// ══════════════════ GAME OVER / WIN ══════════════════
+function gameOver(){
+  if(!G)return;G.running=false;saveGame();const p=G.p;
+  document.getElementById('et').textContent='💀 Has Muerto';
+  document.getElementById('et').className='et death';
+  document.getElementById('estats').innerHTML=
+    [['Nivel',p.level],['Bajas',p.kills],['Oro',p.gold],['Daño',p.totalDmg],['Combo',p.maxCombo+'x'],['Score',G.score]]
+    .map(([l,v])=>'<div class="esx"><div class="esv">'+v+'</div><div class="esl">'+l+'</div></div>').join('');
+  document.getElementById('end').classList.add('on');
+}
+function gameWin(){
+  if(!G)return;G.running=false;saveGame();
+  document.getElementById('et').textContent='🏆 ¡Victoria!';
+  document.getElementById('et').className='et win';
+  document.getElementById('estats').innerHTML=
+    [['Nivel',G.p.level],['Bajas',G.p.kills],['Oro',G.p.gold],['Score',G.score],['Combo',G.p.maxCombo+'x'],['Mapas',G.visitedMaps.size]]
+    .map(([l,v])=>'<div class="esx"><div class="esv">'+v+'</div><div class="esl">'+l+'</div></div>').join('');
+  document.getElementById('end').classList.add('on');
+}
+function backToTitle(){
+  document.getElementById('end').classList.remove('on');
+  document.getElementById('hud').classList.remove('on');
+  document.getElementById('title').style.display='flex';
+  G=null;wxParts=[];logLines=[];shakeAmt=0;
+  cvW.style.transform='';
+  document.getElementById('hotbar').innerHTML='';
+  document.getElementById('clog').innerHTML='';
+  goPhase(0);requestAnimationFrame(bgLoop);
+}
+
+// ══════════════════ MAIN LOOP ══════════════════
+function loop(ts){
+  const dt=Math.min((ts-lastT)/1000,.1);lastT=ts;
+  drawBg(ts);
+  if(G&&G.running){update(dt);drawWorld();}
+  requestAnimationFrame(loop);
+}
+function bgLoop(ts){drawBg(ts);if(!G)requestAnimationFrame(bgLoop);}
+
+// Boot — preload SVGs then start bg loop
+preloadSVGs().then(()=>{
+  requestAnimationFrame(bgLoop);
+});
+</script>
+</body>
+</html>

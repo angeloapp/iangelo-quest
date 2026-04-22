@@ -3838,29 +3838,48 @@
     // ══════════════════════════════════════════
     const IMAGE_CACHE = {};
     const PNG_MAPPING = {
-      // Rutas relativas — mismo origen que Vercel, sin CORS
-      'hero-guerrero':    '/assets/sprites/guerrero-removebg-preview.png',
-      'hero-mago':        '/assets/sprites/mago-removebg-preview.png',
-      'hero-arquero':     '/assets/sprites/arquero-removebg-preview.png',
-      'hero-chaman':      '/assets/sprites/chaman-removebg-preview.png',
-      'enemy-goblin':     '/assets/sprites/gobling-removebg-preview.png',
-      'enemy-gnoll':      '/assets/sprites/gnoll-removebg-preview.png',
-      'enemy-nigromante': '/assets/sprites/nigromante-removebg-preview.png',
-      'enemy-esqueleto':  '/assets/sprites/esqueleto-removebg-preview.png',
-      'enemy-lobo':       '/assets/sprites/lobo_alfa-removebg-preview.png',
-      'enemy-drake':      '/assets/sprites/drake-removebg-preview.png',
-      'enemy-metin':      '/assets/sprites/metin_rojo-removebg-preview.png',
-      'enemy-dragon':     '/assets/sprites/dragon_espectral-removebg-preview.png',
-      'enemy-lich':       '/assets/sprites/lich_rey-removebg-preview.png',
+      'hero-guerrero':    'guerrero-removebg-preview.png',
+      'hero-mago':        'mago-removebg-preview.png',
+      'hero-arquero':     'arquero-removebg-preview.png',
+      'hero-chaman':      'chaman-removebg-preview.png',
+      'enemy-goblin':     'gobling-removebg-preview.png',
+      'enemy-gnoll':      'gnoll-removebg-preview.png',
+      'enemy-nigromante': 'nigromante-removebg-preview.png',
+      'enemy-esqueleto':  'esqueleto-removebg-preview.png',
+      'enemy-lobo':       'lobo_alfa-removebg-preview.png',
+      'enemy-drake':      'drake-removebg-preview.png',
+      'enemy-metin':      'metin_rojo-removebg-preview.png',
+      'enemy-dragon':     'dragon_espectral-removebg-preview.png',
+      'enemy-lich':       'lich_rey-removebg-preview.png',
     };
+
+    function loadAssetWithFallback(key, filename) {
+      return new Promise(resolve => {
+        // Prioridad: 1. Ruta del proyecto local, 2. GitHub, 3. SVG_CACHE (evaluado al dibujar)
+        const urls = [
+          `./assets/sprites/${filename}`,
+          `https://raw.githubusercontent.com/angeloapp/iangelo-quest/main/assets/sprites/${filename}`
+        ];
+        
+        let index = 0;
+        function tryNext() {
+          if (index >= urls.length) {
+            console.warn(`Falló la carga de PNG para ${key}, se usará SVG fallback.`);
+            resolve();
+            return;
+          }
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => { IMAGE_CACHE[key] = img; resolve(); };
+          img.onerror = () => { index++; tryNext(); };
+          img.src = urls[index];
+        }
+        tryNext();
+      });
+    }
+
     async function preloadPNGs() {
-      const promises = Object.entries(PNG_MAPPING).map(([key, url]) => new Promise(resolve => {
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.onload  = () => { IMAGE_CACHE[key] = img; resolve(); };
-        img.onerror = () => { console.warn('No cargó:', url); resolve(); };
-        img.src = url;
-      }));
+      const promises = Object.entries(PNG_MAPPING).map(([key, filename]) => loadAssetWithFallback(key, filename));
       await Promise.all(promises);
       console.log('PNGs cargados:', Object.keys(IMAGE_CACHE).length);
     }
@@ -4664,9 +4683,10 @@
     //  CANVAS SPRITE RENDERERS (direct drawing, no img)
     // ================================================
     function drawHeroSprite(ctx, cls, x, y, w, h) {
-      // Usa PNG del servidor angelo.am (IMAGE_CACHE)
+      // Usar PNG (IMAGE_CACHE) o SVG_CACHE como fallback
       const clsData = CLASSES[cls];
-      const img = clsData && (IMAGE_CACHE[clsData.svgId] || IMAGE_CACHE['hero-guerrero']);
+      const targetId = clsData ? clsData.svgId : 'hero-guerrero';
+      const img = IMAGE_CACHE[targetId] || SVG_CACHE[targetId];
       if (img) {
         ctx.save();
         ctx.shadowBlur = 28;
@@ -4882,8 +4902,8 @@
       ctx.restore();
     }
     function drawEnemySprite(ctx, svgId, col, x, y, w, h) {
-      // Usa PNG del servidor angelo.am (IMAGE_CACHE)
-      const img = IMAGE_CACHE[svgId];
+      // Usar PNG (IMAGE_CACHE) o SVG_CACHE como fallback
+      const img = IMAGE_CACHE[svgId] || SVG_CACHE[svgId];
       if (img) {
         ctx.save();
         ctx.shadowBlur = 22;

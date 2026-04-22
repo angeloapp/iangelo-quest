@@ -3783,44 +3783,52 @@
     const IMGS = {};
     const IMG_PAT = {};
     const ASSET_URLS = {
-      h0: "/assets/sprites/guerrero-removebg-preview.png",
-      h1: "/assets/sprites/mago-removebg-preview.png",
-      h2: "/assets/sprites/arquero-removebg-preview.png",
-      h3: "/assets/sprites/chaman-removebg-preview.png",
-      "enemy-goblin":     "https://i.imgur.com/ZrBfTAl.png",
-      "enemy-esqueleto":  "https://i.imgur.com/Ms8SPNL.png",
-      "enemy-lobo":       "https://i.imgur.com/HhgemOw.png",
-      "enemy-gnoll":      "https://i.imgur.com/IcqAtEk.png",
-      "enemy-nigromante": "https://i.imgur.com/Rtm9R20.png",
-      "enemy-drake":      "https://i.imgur.com/ZilkTqx.png",
-      "enemy-metin":      "https://i.imgur.com/bPzRR0M.png",
-      "enemy-dragon":     "https://i.imgur.com/E4h3EZR.png",
-      "enemy-lich":       "https://i.imgur.com/ThPFURk.png",
-      "bg_bosque_oscuro":    "https://i.imgur.com/kgO2wig.png",
-      "bg_desierto_eterno":  "https://i.imgur.com/lTyQpIG.png",
-      "bg_dungeon_abismo":   "https://i.imgur.com/7D5oYpH.png",
-      "bg_montanas_nevadas": "https://i.imgur.com/rdOihAJ.png",
-      "bg_ciudad_fantasma":  "https://i.imgur.com/7E01HkA.png",
-      "bg_templo_sagrado":   "https://i.imgur.com/BI4enIt.png",
-      "bg_volcan_eterno":    "https://i.imgur.com/gXOzXEt.png",
-      "bg_pantano_maldito":  "https://i.imgur.com/EwI8sEx.png",
+      h0: "https://angelo.am/iangeloquest/guerrero.png",
+      h1: "https://angelo.am/iangeloquest/mago.png",
+      h2: "https://angelo.am/iangeloquest/arquero.png",
+      h3: "https://angelo.am/iangeloquest/chaman.png",
+      "enemy-goblin":     "https://angelo.am/iangeloquest/gobling.png",
+      "enemy-esqueleto":  "https://angelo.am/iangeloquest/esqueleto.png",
+      "enemy-lobo":       "https://angelo.am/iangeloquest/lobo_alfa.png",
+      "enemy-gnoll":      "https://angelo.am/iangeloquest/gnoll.png",
+      "enemy-nigromante": "https://angelo.am/iangeloquest/nigromante.png",
+      "enemy-drake":      "https://angelo.am/iangeloquest/drake.png",
+      "enemy-metin":      "https://angelo.am/iangeloquest/metin_rojo.png",
+      "enemy-dragon":     "https://angelo.am/iangeloquest/dragon_espectral.png",
+      "enemy-lich":       "https://angelo.am/iangeloquest/lich_rey.png",
     };
     (function preloadAssets() {
       for (const [k, url] of Object.entries(ASSET_URLS)) {
         const im = new Image();
-        im.crossOrigin = "anonymous";
+        // same-origin server — no crossOrigin needed
         im.onload  = () => { IMGS[k] = im; IMG_PAT[k] = null; };
         im.onerror = () => console.warn("IMG load fail:", k, url);
         im.src = url;
       }
     })();
-    function getBgPattern(ctx, mapKey) {
-      const k = "bg_" + mapKey;
-      if (IMG_PAT[k]) return IMG_PAT[k];
-      if (!IMGS[k]) return null;
-      try { const p = ctx.createPattern(IMGS[k], "repeat"); IMG_PAT[k] = p; return p; }
-      catch(e) { return null; }
+    // drawBgTile: draws one T×T tile from the map image (tiled seamlessly)
+    function drawBgTile(ctx, mapKey, tx, ty) {
+      try {
+        const k = "bg_" + mapKey;
+        const img = IMGS[k];
+        if (!img || !img.complete || img.naturalWidth === 0) return false;
+        // Pick source region by tile grid position
+        const cols = Math.max(1, (img.naturalWidth  / T) | 0);
+        const rows = Math.max(1, (img.naturalHeight / T) | 0);
+        const col  = Math.floor(tx / T) % cols;
+        const row  = Math.floor(ty / T) % rows;
+        const sx = col * T, sy = row * T;
+        const sw = Math.min(T, img.naturalWidth  - sx);
+        const sh = Math.min(T, img.naturalHeight - sy);
+        if (sw > 0 && sh > 0) {
+          ctx.drawImage(img, sx, sy, sw, sh, tx, ty, T, T);
+        } else {
+          ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, tx, ty, T, T);
+        }
+        return true;
+      } catch(e) { return false; }
     }
+    function getBgPattern(ctx, mapKey) { return null; } // replaced by drawBgTile
 
     const ENEMIES = [
       { name: 'Goblin',           svgId: 'enemy-goblin',      hp: 65,   atk: [9, 20],   xp: 28,  spd: 1.4, col: '#44bb44', lv: 1,  gold: [4, 10],    drop: .65 },
@@ -4621,14 +4629,19 @@
     //  CANVAS SPRITE RENDERERS (direct drawing, no img)
     // ================================================
     function drawHeroSprite(ctx, cls, x, y, w, h) {
-      // Try Imgur image first
       const hKey = "h" + cls;
-      if (IMGS[hKey] && IMGS[hKey].complete) {
-        ctx.save();
-        ctx.shadowBlur = 0; ctx.shadowColor = "transparent";
-        ctx.drawImage(IMGS[hKey], x - w * 0.5, y - h * 0.95, w, h);
-        ctx.restore();
-        return;
+      const _hi = IMGS[hKey];
+      if (_hi && _hi.complete && _hi.naturalWidth > 0) {
+        try {
+          // Scale image maintaining aspect ratio, fit within w x h box
+          const aspect = _hi.naturalWidth / _hi.naturalHeight;
+          let dw = w, dh = h;
+          if (aspect > 1) { dh = w / aspect; } else { dw = h * aspect; }
+          ctx.save();
+          ctx.drawImage(_hi, x - dw * 0.5, y - dh, dw, dh);
+          ctx.restore();
+          return;
+        } catch(e) {}
       }
       // Fallback: Top-down RPG style procedural sprite
       const col = CLASSES[cls].col;
@@ -4837,6 +4850,19 @@
       ctx.restore();
     }
     function drawEnemySprite(ctx, svgId, col, x, y, w, h) {
+      const _ei = IMGS[svgId];
+      if (_ei && _ei.complete && _ei.naturalWidth > 0) {
+        try {
+          // Scale maintaining aspect ratio, fit within w x h box
+          const aspect = _ei.naturalWidth / _ei.naturalHeight;
+          let dw = w, dh = h;
+          if (aspect > 1) { dh = w / aspect; } else { dw = h * aspect; }
+          ctx.save();
+          ctx.drawImage(_ei, x - dw * 0.5, y - dh, dw, dh);
+          ctx.restore();
+          return;
+        } catch(e) {}
+      }
       ctx.save();
       ctx.shadowBlur = 0; ctx.shadowColor = 'transparent'; // prevent blur bleed
       ctx.translate(x, y);
@@ -5053,12 +5079,10 @@
         const tx = x * T, ty = y * T, h = th(x, y);
         if (tile === 0) {
           // Try Imgur background image first
-          const bgPat = getBgPattern(ctxW, G.mapKey);
-          if (bgPat) {
-            ctxW.fillStyle = bgPat;
-            ctxW.fillRect(tx, ty, T, T);
-            // Subtle shadow overlay for atmosphere
-            ctxW.fillStyle = 'rgba(0,0,0,0.08)';
+          if (drawBgTile(ctxW, G.mapKey, tx, ty)) {
+            // Subtle atmosphere tint
+            const _d = ['dungeon_abismo','ciudad_fantasma','pantano_maldito','volcan_eterno'].includes(G.mapKey);
+            ctxW.fillStyle = _d ? 'rgba(0,0,0,0.15)' : 'rgba(0,0,0,0.03)';
             ctxW.fillRect(tx, ty, T, T);
           } else {
             // Fallback: Textured floor — deterministic variation
@@ -5081,8 +5105,12 @@
             }
           }
         } else if (tile === 1) {
-          // Wall — dark base with inner bevel and subtle diagonal crack
-          ctxW.fillStyle = m.wall;
+          // Wall — map image darkened, or flat colour fallback
+          if (!drawBgTile(ctxW, G.mapKey, tx, ty)) {
+            ctxW.fillStyle = m.wall;
+            ctxW.fillRect(tx, ty, T, T);
+          }
+          ctxW.fillStyle = 'rgba(0,0,0,0.65)';
           ctxW.fillRect(tx, ty, T, T);
           // Inner bevel shadow
           ctxW.fillStyle = 'rgba(0,0,0,.32)';

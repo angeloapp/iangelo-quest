@@ -3838,19 +3838,20 @@
     // ══════════════════════════════════════════
     const IMAGE_CACHE = {};
     const PNG_MAPPING = {
-      'hero-guerrero':    'https://angelo.am/iangeloquest/guerrero.png',
-      'hero-mago':        'https://angelo.am/iangeloquest/mago.png',
-      'hero-arquero':     'https://angelo.am/iangeloquest/arquero.png',
-      'hero-chaman':      'https://angelo.am/iangeloquest/chaman.png',
-      'enemy-goblin':     'https://angelo.am/iangeloquest/gobling.png',
-      'enemy-gnoll':      'https://angelo.am/iangeloquest/gnoll.png',
-      'enemy-nigromante': 'https://angelo.am/iangeloquest/nigromante.png',
-      'enemy-esqueleto':  'https://angelo.am/iangeloquest/esqueleto.png',
-      'enemy-lobo':       'https://angelo.am/iangeloquest/lobo_alfa.png',
-      'enemy-drake':      'https://angelo.am/iangeloquest/drake.png',
-      'enemy-metin':      'https://angelo.am/iangeloquest/metin_rojo.png',
-      'enemy-dragon':     'https://angelo.am/iangeloquest/dragon_espectral.png',
-      'enemy-lich':       'https://angelo.am/iangeloquest/lich_rey.png',
+      // Rutas relativas — mismo origen que Vercel, sin CORS
+      'hero-guerrero':    '/assets/sprites/guerrero-removebg-preview.png',
+      'hero-mago':        '/assets/sprites/mago-removebg-preview.png',
+      'hero-arquero':     '/assets/sprites/arquero-removebg-preview.png',
+      'hero-chaman':      '/assets/sprites/chaman-removebg-preview.png',
+      'enemy-goblin':     '/assets/sprites/gobling-removebg-preview.png',
+      'enemy-gnoll':      '/assets/sprites/gnoll-removebg-preview.png',
+      'enemy-nigromante': '/assets/sprites/nigromante-removebg-preview.png',
+      'enemy-esqueleto':  '/assets/sprites/esqueleto-removebg-preview.png',
+      'enemy-lobo':       '/assets/sprites/lobo_alfa-removebg-preview.png',
+      'enemy-drake':      '/assets/sprites/drake-removebg-preview.png',
+      'enemy-metin':      '/assets/sprites/metin_rojo-removebg-preview.png',
+      'enemy-dragon':     '/assets/sprites/dragon_espectral-removebg-preview.png',
+      'enemy-lich':       '/assets/sprites/lich_rey-removebg-preview.png',
     };
     async function preloadPNGs() {
       const promises = Object.entries(PNG_MAPPING).map(([key, url]) => new Promise(resolve => {

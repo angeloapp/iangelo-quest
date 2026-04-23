@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>iAngelo Quest V2 — Leyenda Definitiva</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cinhzel:wght@400;700;900&family=Cinzel+Decorative:wght@700;900&family=IM+Fell+English:ital@0;1&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cinzel+Decorative:wght@700;900&family=IM+Fell+English:ital@0;1&display=swap');
 
     :root {
       --gold: #c9a84c;
@@ -3855,7 +3855,7 @@
 
     function loadAssetWithFallback(key, filename) {
       return new Promise(resolve => {
-        // Prioridad: 1. Ruta del proyecto local, 2. GitHub, 3. SVG_CACHE (evaluado al dibujar)
+        // Prioridad: 1. Ruta del proyecto local, 2. GitHub
         const urls = [
           `./assets/sprites/${filename}`,
           `https://raw.githubusercontent.com/angeloapp/iangelo-quest/main/assets/sprites/${filename}`
@@ -3864,12 +3864,12 @@
         let index = 0;
         function tryNext() {
           if (index >= urls.length) {
-            console.warn(`Falló la carga de PNG para ${key}, se usará SVG fallback.`);
+            console.warn(`Falló la carga de PNG para ${key}, se usará Procedural Canvas.`);
             resolve();
             return;
           }
           const img = new Image();
-          img.crossOrigin = 'anonymous';
+          // Eliminado crossOrigin='anonymous' para evitar errores CORS en rutas locales y GitHub raw
           img.onload = () => { IMAGE_CACHE[key] = img; resolve(); };
           img.onerror = () => { index++; tryNext(); };
           img.src = urls[index];
@@ -4683,10 +4683,9 @@
     //  CANVAS SPRITE RENDERERS (direct drawing, no img)
     // ================================================
     function drawHeroSprite(ctx, cls, x, y, w, h) {
-      // Usar PNG (IMAGE_CACHE) o SVG_CACHE como fallback
       const clsData = CLASSES[cls];
       const targetId = clsData ? clsData.svgId : 'hero-guerrero';
-      const img = IMAGE_CACHE[targetId] || SVG_CACHE[targetId];
+      const img = IMAGE_CACHE[targetId];
       if (img) {
         ctx.save();
         ctx.shadowBlur = 28;
@@ -4902,8 +4901,7 @@
       ctx.restore();
     }
     function drawEnemySprite(ctx, svgId, col, x, y, w, h) {
-      // Usar PNG (IMAGE_CACHE) o SVG_CACHE como fallback
-      const img = IMAGE_CACHE[svgId] || SVG_CACHE[svgId];
+      const img = IMAGE_CACHE[svgId];
       if (img) {
         ctx.save();
         ctx.shadowBlur = 22;

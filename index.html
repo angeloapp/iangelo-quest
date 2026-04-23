@@ -3715,6 +3715,51 @@
   </svg>
 
   <script>
+// ==================== FIX SPRITES - SUPER GROK ====================
+const CORRECT_SPRITE_URLS = {
+  "guerrero-removebg-preview.png": "https://raw.githubusercontent.com/angeloapp/iangelo-quest/main/assets/sprites/guerrero-removebg-preview.png",
+  "mago-removebg-preview.png": "https://raw.githubusercontent.com/angeloapp/iangelo-quest/main/assets/sprites/mago-removebg-preview.png",
+  "arquero-removebg-preview.png": "https://raw.githubusercontent.com/angeloapp/iangelo-quest/main/assets/sprites/arquero-removebg-preview.png",
+  "chaman-removebg-preview.png": "https://raw.githubusercontent.com/angeloapp/iangelo-quest/main/assets/sprites/chaman-removebg-preview.png",
+  "gobling-removebg-preview.png": "https://raw.githubusercontent.com/angeloapp/iangelo-quest/main/assets/sprites/gobling-removebg-preview.png",
+  "esqueleto-removebg-preview.png": "https://raw.githubusercontent.com/angeloapp/iangelo-quest/main/assets/sprites/esqueleto-removebg-preview.png",
+  "lobo_alfa-removebg-preview.png": "https://raw.githubusercontent.com/angeloapp/iangelo-quest/main/assets/sprites/lobo_alfa-removebg-preview.png",
+  "gnoll-removebg-preview.png": "https://raw.githubusercontent.com/angeloapp/iangelo-quest/main/assets/sprites/gnoll-removebg-preview.png",
+  "nigromante-removebg-preview.png": "https://raw.githubusercontent.com/angeloapp/iangelo-quest/main/assets/sprites/nigromante-removebg-preview.png",
+  "drake-removebg-preview.png": "https://raw.githubusercontent.com/angeloapp/iangelo-quest/main/assets/sprites/drake-removebg-preview.png",
+  "metin_rojo-removebg-preview.png": "https://raw.githubusercontent.com/angeloapp/iangelo-quest/main/assets/sprites/metin_rojo-removebg-preview.png",
+  "dragon_espectral-removebg-preview.png": "https://raw.githubusercontent.com/angeloapp/iangelo-quest/main/assets/sprites/dragon_espectral-removebg-preview.png",
+  "lich_rey-removebg-preview.png": "https://raw.githubusercontent.com/angeloapp/iangelo-quest/main/assets/sprites/lich_rey-removebg-preview.png"
+};
+
+// Override PNG_ASSETS if it exists
+if (typeof PNG_ASSETS !== "undefined") {
+  Object.keys(PNG_ASSETS).forEach(key => {
+    const filename = key.split("/").pop();
+    if (CORRECT_SPRITE_URLS[filename]) {
+      PNG_ASSETS[key] = CORRECT_SPRITE_URLS[filename];
+    }
+  });
+}
+
+// Force correct URLs in any asset loading
+window.addEventListener("load", () => {
+  if (typeof loadAssets === "function") {
+    const originalLoadAssets = loadAssets;
+    loadAssets = function() {
+      // Force correct URLs
+      Object.keys(CORRECT_SPRITE_URLS).forEach(filename => {
+        const img = new Image();
+        img.src = CORRECT_SPRITE_URLS[filename];
+        window[filename.replace(".png", "")] = img;
+      });
+      return originalLoadAssets.apply(this, arguments);
+    };
+  }
+});
+
+console.log("%c✅ SPRITES FIX APLICADO - Super Grok", "color:#0f0");
+
     // ══════════════════════════════════════════
     //  CONSTANTS
     // ══════════════════════════════════════════
